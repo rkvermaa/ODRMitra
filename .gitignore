@@ -1,0 +1,110 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ========================
+# Node.js
+# ========================
+node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# Next.js (Frontend)
+# ========================
+frontend/.next/
+frontend/out/
+frontend/.vercel
+
+# ========================
+# Secrets & Environment
+# ========================
+.env
+.env.local
+.env.*.local
+backend/config/.secrets.toml
+*.secret
+*.pem
+*.key
+
+# ========================
+# Baileys WhatsApp Sessions
+# ========================
+baileys-service/sessions/
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+*.log.*
+*.log.gz
+
+# ========================
+# Database
+# ========================
+*.sqlite3
+*.db
+
+# ========================
+# IDE & Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ========================
+# Testing & Coverage
+# ========================
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# ========================
+# Build artifacts
+# ========================
+*.tsbuildinfo
+
+# ========================
+# Project docs (reference only, not for repo)
+# ========================
+odr-docs/
+.claude/
+
+# ========================
+# Misc
+# ========================
+check_procs.ps1

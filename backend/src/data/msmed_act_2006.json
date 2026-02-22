@@ -1,0 +1,155 @@
+{
+  "15": {
+    "title": "Liability of buyer to make payment",
+    "content": "Where any supplier supplies any goods or renders any services to any buyer, the buyer shall make payment therefor on or before the date agreed upon between him and the supplier in writing or, where there is no agreement in this behalf, before the appointed day. Provided that in no case the period agreed upon between the supplier and the buyer in writing shall exceed forty-five days from the day of acceptance or the day of deemed acceptance.",
+    "key_points": [
+      "Payment must be made on the agreed date",
+      "If no agreement, payment due within 15 days of acceptance",
+      "Maximum payment period cannot exceed 45 days from acceptance",
+      "Acceptance includes deemed acceptance"
+    ],
+    "keywords": ["payment", "liability", "buyer", "supplier", "45 days", "acceptance", "appointed day"]
+  },
+  "15a": {
+    "title": "Appointed day (Definition)",
+    "content": "The 'appointed day' means the day following immediately after the expiry of the period of fifteen days from the day of acceptance or the day of deemed acceptance of any goods or any services by a buyer from a supplier.",
+    "key_points": [
+      "Appointed day = 15 days after acceptance",
+      "Applies when no written agreement on payment date"
+    ],
+    "keywords": ["appointed day", "15 days", "acceptance", "definition"]
+  },
+  "16": {
+    "title": "Date from which and rate at which interest is payable",
+    "content": "Where any buyer fails to make payment of the amount to the supplier, as required under section 15, the buyer shall, notwithstanding anything contained in any agreement between the buyer and the supplier or in any law for the time being in force, be liable to pay compound interest with monthly rests to the supplier on that amount from the appointed day or, as the case may be, from the date immediately following the date agreed upon, at three times of the bank rate notified by the Reserve Bank.",
+    "key_points": [
+      "Interest = 3 times RBI bank rate (currently 6.50% x 3 = 19.50% p.a.)",
+      "Compound interest with monthly rests",
+      "Interest runs from appointed day or agreed date",
+      "Overrides any contrary agreement",
+      "Overrides any other law"
+    ],
+    "formula": "A = P * (1 + r/12)^n where r = 3 * bank_rate, n = months",
+    "current_rate": {
+      "rbi_bank_rate": 6.50,
+      "applicable_rate": 19.50,
+      "compounding": "monthly"
+    },
+    "keywords": ["interest", "compound", "monthly", "bank rate", "RBI", "19.50", "three times", "delayed payment"]
+  },
+  "17": {
+    "title": "Buyer not to be allowed certain claims",
+    "content": "Notwithstanding anything contained in any other law for the time being in force, the buyer shall not be entitled to claim any amount paid or payable under or in accordance with the provisions of section 16 (interest on delayed payment) as expenditure or deduction or allowance for the purposes of computation of income under the Income-tax Act, 1961.",
+    "key_points": [
+      "Interest paid under Section 16 is NOT tax-deductible",
+      "Buyer cannot claim it as business expenditure",
+      "This is a penalty provision to discourage delayed payments"
+    ],
+    "keywords": ["tax", "deduction", "income tax", "expenditure", "penalty", "not allowed"]
+  },
+  "18": {
+    "title": "Reference to Micro and Small Enterprises Facilitation Council",
+    "content": "Notwithstanding anything contained in any other law for the time being in force, any party to a dispute may, with regard to any amount due under section 17, make a reference to the Micro and Small Enterprises Facilitation Council (MSEFC). (2) On receipt of a reference under sub-section (1), the Council shall conduct or get conducted conciliation in the matter. (3) Where the conciliation is not successful within such period as may be prescribed, the Council shall either itself take up the dispute for arbitration or refer it to any institution or centre providing alternate dispute resolution services. (4) The Council shall dispose of the dispute within 90 days from the date of making such a reference.",
+    "key_points": [
+      "Either party can file reference with MSEFC",
+      "MSEFC first attempts conciliation",
+      "If conciliation fails, proceeds to arbitration",
+      "Must dispose within 90 days (extendable to 180 days)",
+      "No court fee required for filing"
+    ],
+    "sub_sections": {
+      "18(1)": "Either party can make reference to MSEFC for amount due",
+      "18(2)": "MSEFC shall conduct or get conducted conciliation",
+      "18(3)": "If conciliation fails, MSEFC takes up arbitration or refers to ADR centre",
+      "18(4)": "Disposal within 90 days from date of reference"
+    },
+    "keywords": ["msefc", "facilitation council", "conciliation", "arbitration", "90 days", "reference", "dispute", "filing"]
+  },
+  "19": {
+    "title": "Application for setting aside decree, award or order",
+    "content": "No application for setting aside any decree, award or other order made either by the Council itself or by any institution or centre referred to in sub-section (3) of section 18 shall be entertained by any court unless the appellant (not being the supplier) has deposited with it seventy-five percent of the amount in terms of the decree, award or order.",
+    "key_points": [
+      "To challenge MSEFC order, buyer must deposit 75% of awarded amount",
+      "This provision protects supplier's interest",
+      "Only non-supplier (buyer) needs to make deposit",
+      "Applies to decrees, awards, and orders"
+    ],
+    "keywords": ["appeal", "setting aside", "75 percent", "deposit", "decree", "award", "challenge"]
+  },
+  "20": {
+    "title": "Establishment of Micro and Small Enterprises Facilitation Councils",
+    "content": "The State Government shall, by notification, establish one or more Micro and Small Enterprises Facilitation Councils at such places, exercising such jurisdiction and for such areas, as may be specified in the notification.",
+    "key_points": [
+      "State Governments establish MSEFCs",
+      "MSEFCs have territorial jurisdiction",
+      "Multiple MSEFCs can exist per state",
+      "Established by state notification"
+    ],
+    "keywords": ["establishment", "state government", "jurisdiction", "notification", "council"]
+  },
+  "21": {
+    "title": "Composition of Micro and Small Enterprises Facilitation Council",
+    "content": "The Micro and Small Enterprises Facilitation Council shall consist of not less than three but not more than five members to be appointed by the State Government.",
+    "key_points": [
+      "3 to 5 members",
+      "Appointed by State Government",
+      "Includes Director of Industries (ex-officio)",
+      "Includes representatives of banks, MSME associations"
+    ],
+    "keywords": ["composition", "members", "appointment", "director of industries"]
+  },
+  "22": {
+    "title": "Duties of buyer — Filing of statement",
+    "content": "Where a buyer is required to get his annual accounts audited under any law for the time being in force, such buyer shall furnish the following additional information in his annual statement of accounts: (i) the principal amount and the interest due thereon remaining unpaid to any supplier as at the end of each accounting year; (ii) the amount of interest paid by the buyer in terms of section 16; (iii) the amount of the payment made to the supplier beyond the appointed day during each accounting year; (iv) the amount of interest accrued and remaining unpaid at the end of each accounting year; (v) the amount of further interest remaining due and payable even in the succeeding years.",
+    "key_points": [
+      "Buyers must disclose MSME dues in annual accounts",
+      "Must report unpaid principal and interest",
+      "Must report delayed payments made during the year",
+      "Must report accrued interest",
+      "Applies to all audited entities"
+    ],
+    "keywords": ["annual accounts", "disclosure", "audit", "statement", "reporting", "buyer duty"]
+  },
+  "2_definitions": {
+    "title": "Key Definitions under MSMED Act 2006",
+    "content": "Important definitions for dispute resolution context.",
+    "definitions": {
+      "micro_enterprise": "Investment in plant & machinery up to Rs. 1 crore and turnover up to Rs. 5 crore",
+      "small_enterprise": "Investment in plant & machinery up to Rs. 10 crore and turnover up to Rs. 50 crore",
+      "medium_enterprise": "Investment in plant & machinery up to Rs. 50 crore and turnover up to Rs. 250 crore",
+      "supplier": "A micro or small enterprise which has filed a memorandum with the authority",
+      "buyer": "Whoever buys any goods or receives any services from a supplier for consideration",
+      "appointed_day": "Day following 15 days from acceptance/deemed acceptance of goods/services"
+    },
+    "keywords": ["definition", "micro", "small", "medium", "enterprise", "supplier", "buyer", "classification"]
+  },
+  "odr_process": {
+    "title": "Online Dispute Resolution (ODR) Process for MSME Disputes",
+    "content": "The ODR mechanism provides a 4-phase digital resolution process for MSME delayed payment disputes.",
+    "phases": {
+      "phase_1_dgp": {
+        "name": "Digital Guided Pathway (DGP)",
+        "description": "AI-driven preliminary assessment where parties understand likely outcomes before formal proceedings",
+        "duration": "7-14 days",
+        "steps": ["Party registration", "SOC filing", "Respondent notification", "SOD filing", "AI outcome prediction", "Settlement suggestion"]
+      },
+      "phase_2_unp": {
+        "name": "Unmanned Negotiation Platform (UNP)",
+        "description": "AI-facilitated negotiation where parties exchange offers with AI guidance",
+        "duration": "15-30 days",
+        "steps": ["Opening offers", "Counter-offers", "AI mediation suggestions", "Settlement agreement"]
+      },
+      "phase_3_conciliation": {
+        "name": "Conciliation",
+        "description": "Human conciliator-assisted resolution with AI support for documentation",
+        "duration": "30-45 days"
+      },
+      "phase_4_arbitration": {
+        "name": "Arbitration",
+        "description": "Formal binding arbitration proceedings via MSEFC",
+        "duration": "45-90 days"
+      }
+    },
+    "keywords": ["odr", "online dispute resolution", "dgp", "digital guided pathway", "unp", "negotiation", "conciliation", "arbitration", "process"]
+  }
+}
