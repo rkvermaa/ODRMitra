@@ -344,14 +344,23 @@ export interface KnowledgeDoc {
   updated_at: string;
 }
 
+/** Qdrant collection stats. Counts are null when Qdrant omits them. */
+export interface QdrantCollectionInfo {
+  name: string;
+  vectors_count: number | null;
+  points_count: number | null;
+  /** Absent when the collection lookup failed. */
+  status?: string;
+}
+
 export interface KnowledgeStats {
   total_documents: number;
   indexed_documents: number;
   failed_documents: number;
   pending_documents: number;
   total_chunks: number;
-  legal_collection: Record<string, unknown>;
-  case_docs_collection: Record<string, unknown>;
+  legal_collection: QdrantCollectionInfo;
+  case_docs_collection: QdrantCollectionInfo;
 }
 
 export function adminListKnowledgeDocs() {
