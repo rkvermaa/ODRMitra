@@ -10,13 +10,14 @@ import {
   FilePlus,
   Scale,
   BookOpen,
-  LogOut,
   Menu,
   X,
   ChevronRight,
   Smartphone,
 } from "lucide-react";
 import * as api from "@/lib/api";
+import UserMenu from "@/components/UserMenu";
+import { formatMobile } from "@/lib/format";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -131,7 +132,7 @@ export default function DashboardLayout({
             </div>
             {botNumbers.map((bot, i) => (
               <p key={i} className="text-xs text-navy-200 font-mono">
-                +{bot.phone_number.replace(/(\d{2})(\d{5})(\d{5})/, "$1 $2 $3")}
+                {formatMobile(bot.phone_number)}
                 {bot.label && (
                   <span className="text-navy-300 ml-1">({bot.label})</span>
                 )}
@@ -140,19 +141,9 @@ export default function DashboardLayout({
           </div>
         )}
 
-        {/* User info + Logout */}
-        <div className="border-t border-navy-500 p-4">
-          <div className="mb-3 text-sm">
-            <p className="font-medium">{name}</p>
-            <p className="text-xs capitalize text-navy-200">{role}</p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-navy-200 transition-colors hover:bg-navy-500 hover:text-white"
-          >
-            <LogOut className="h-4 w-4" />
-            Sign Out
-          </button>
+        {/* User menu */}
+        <div className="border-t border-navy-500 p-3">
+          <UserMenu name={name} role={role} onLogout={handleLogout} />
         </div>
       </aside>
 

@@ -18,6 +18,14 @@ export function formatDate(dateStr: string | null | undefined): string {
   });
 }
 
+/** Format a 10-digit Indian mobile number as +91 XXXXX XXXXX */
+export function formatMobile(mobile: string | null | undefined): string {
+  if (!mobile) return "—";
+  const digits = mobile.replace(/\D/g, "").slice(-10);
+  if (digits.length !== 10) return mobile;
+  return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+}
+
 /** Human-readable status */
 const STATUS_LABELS: Record<string, string> = {
   filed: "Filed",
