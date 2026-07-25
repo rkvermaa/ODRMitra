@@ -9,10 +9,12 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path $PSScriptRoot
 $Backend = Join-Path $Root "backend"
 $Frontend = Join-Path $Root "frontend"
+$Baileys = Join-Path $Root "baileys-service"
 $Logs = Join-Path $Backend "logs"
 
 $BackendPort = 8001
 $FrontendPort = 3002
+$BaileysPort = 3001
 $DockerDesktop = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
 # Real TCP connect, not listener enumeration — Docker Desktop's port proxy
@@ -90,6 +92,20 @@ function Start-Frontend {
         -RedirectStandardError (Join-Path $Logs "frontend.err.log")
 }
 
+# WhatsApp bridge. Its config defaults to backend :8000; this machine runs
+# the backend on :8001, so point it there explicitly.
+function Start-Baileys {
+    if (Test-Port $BaileysPort) { Write-Host "[stack] baileys already on :$BaileysPort"; return }
+    Write-Host "[stack] starting baileys (WhatsApp) on :$BaileysPort"
+    $cmdLine = "set BACKEND_URL=http://127.0.0.1:$BackendPort" +
+    "&& set BACKEND_WEBHOOK_URL=http://127.0.0.1:$BackendPort/api/v1/channel/whatsapp/webhook" +
+    "&& node src/index.js"
+    Start-Process -FilePath "cmd.exe" -ArgumentList "/c", $cmdLine `
+        -WorkingDirectory $Baileys -WindowStyle Hidden `
+        -RedirectStandardOutput (Join-Path $Logs "baileys.out.log") `
+        -RedirectStandardError (Join-Path $Logs "baileys.err.log")
+}
+
 # First agent request loads the embedding model (60-90s). Do it now so the
 # demo never eats the cold start. Non-fatal: the stack is up either way.
 function Warm-Agent {
@@ -128,6 +144,7 @@ function Show-Status {
         @{ Name = "qdrant    :6333"; Ok = (Test-Port 6333) }
         @{ Name = "backend   :$BackendPort"; Ok = (Test-Port $BackendPort) }
         @{ Name = "frontend  :$FrontendPort"; Ok = (Test-Port $FrontendPort) }
+        @{ Name = "baileys   :$BaileysPort"; Ok = (Test-Port $BaileysPort) }
     )
     foreach ($r in $rows) {
         $mark = if ($r.Ok) { "UP  " } else { "DOWN" }
@@ -163,12 +180,18 @@ switch ($Cmd) {
         Wait-Http "http://127.0.0.1:$BackendPort/health" 240 "backend"
         Wait-Http "http://127.0.0.1:$FrontendPort/login" 150 "frontend"
         Warm-Agent
+        # After the warm-up: baileys tries to restore WhatsApp sessions from
+        # the backend 3s after boot, so the backend must be responsive by then.
+        Start-Baileys
+        $deadline = (Get-Date).AddSeconds(30)
+        while ((Get-Date) -lt $deadline -and -not (Test-Port $BaileysPort)) { Start-Sleep -Seconds 2 }
         Write-Host ""
         Write-Host "ODRMitra is up:  http://localhost:$FrontendPort" -ForegroundColor Green
         Show-Status
     }
     "down" {
         Stop-Port $FrontendPort "frontend"
+        Stop-Port $BaileysPort "baileys"
         Stop-Port $BackendPort "backend"
         Invoke-Quiet "docker stop odrmitra-postgres odrmitra-qdrant" | Out-Null
         Write-Host "[stack] containers stopped"
@@ -181,6 +204,8 @@ switch ($Cmd) {
         Get-Content (Join-Path $Logs "backend.err.log") -Tail 30
         Write-Host "== frontend.out.log ==" -ForegroundColor Cyan
         Get-Content (Join-Path $Logs "frontend.out.log") -Tail 20
+        Write-Host "== baileys.out.log ==" -ForegroundColor Cyan
+        Get-Content (Join-Path $Logs "baileys.out.log") -Tail 20 -ErrorAction SilentlyContinue
     }
     default { throw "Unknown command '$Cmd' (use: up | down | status | warm | logs)" }
 }
