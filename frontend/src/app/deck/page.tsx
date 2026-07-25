@@ -250,59 +250,87 @@ function DemoMapSlide() {
   );
 }
 
+function TechTag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-navy-400/30 bg-navy-800/60 px-2 py-0.5 font-mono text-[10.5px] text-navy-300">
+      {children}
+    </span>
+  );
+}
+
 function ArchitectureSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>How It Works</Kicker>
-      <SlideTitle>One autonomous agent, twelve legal tools</SlideTitle>
+      <SlideTitle>One assistant listens, thinks in law, and acts</SlideTitle>
 
-      <div className="mt-10 grid grid-cols-[1fr_auto_1.3fr_auto_1fr] items-center gap-4">
+      <div className="mt-10 grid grid-cols-[1fr_auto_1.3fr_auto_1fr] items-stretch gap-4">
+        {/* Users reach it */}
         <GlowBox>
           <p className="text-sm font-semibold uppercase tracking-wider text-navy-300">
-            Channels
+            How sellers reach it
           </p>
           <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><Mic className="h-5 w-5 text-saffron-400" /> Voice (Sarvam STT/TTS)</p>
-            <p className="flex items-center gap-2.5"><MessageSquare className="h-5 w-5 text-saffron-400" /> WhatsApp</p>
-            <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-saffron-400" /> Web (Next.js)</p>
+            <p className="flex items-center gap-2.5"><Mic className="h-5 w-5 text-saffron-400" /> A phone conversation</p>
+            <p className="flex items-center gap-2.5"><MessageSquare className="h-5 w-5 text-saffron-400" /> A WhatsApp message</p>
+            <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-saffron-400" /> A simple website</p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            <TechTag>Sarvam AI voice</TechTag>
+            <TechTag>Next.js</TechTag>
           </div>
         </GlowBox>
 
-        <ArrowRight className="h-6 w-6 text-saffron-400" />
+        <ArrowRight className="h-6 w-6 self-center text-saffron-400" />
 
+        {/* The brain */}
         <GlowBox className="border-saffron-500/30 bg-saffron-500/10">
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-saffron-300">
-            <Bot className="h-4 w-4" /> Framework-native AI Agent
+            <Bot className="h-4 w-4" /> The AI Assistant
           </p>
           <p className="mt-2 text-[15px] leading-relaxed text-navy-100">
-            LangChain autonomous agent with{" "}
-            <span className="font-semibold text-white">12 scoped ODR tools</span> —
-            file, classify, predict, calculate Section 16 interest, send
-            intimations, record defenses, draft settlements.
+            One assistant understands the conversation and acts only through{" "}
+            <span className="font-semibold text-white">
+              12 approved legal actions
+            </span>{" "}
+            — file the case, notify the buyer, record the defense, predict the
+            outcome, calculate interest, draft the settlement.
           </p>
           <p className="mt-2 text-[15px] text-navy-100">
-            <span className="font-semibold text-white">Model-agnostic:</span>{" "}
-            DeepSeek today, any LLM tomorrow — one config line.
+            The underlying AI model is{" "}
+            <span className="font-semibold text-white">swappable</span> — the
+            government can choose any model, Indian or open-source.
           </p>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            <TechTag>LangChain agent</TechTag>
+            <TechTag>DeepSeek LLM</TechTag>
+            <TechTag>FastAPI</TechTag>
+          </div>
         </GlowBox>
 
-        <ArrowRight className="h-6 w-6 text-saffron-400" />
+        <ArrowRight className="h-6 w-6 self-center text-saffron-400" />
 
+        {/* Knowledge */}
         <GlowBox>
           <p className="text-sm font-semibold uppercase tracking-wider text-navy-300">
-            Knowledge & Data
+            What it thinks with
           </p>
           <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><BookOpen className="h-5 w-5 text-saffron-400" /> RAG: 208-chunk MSMED KB</p>
-            <p className="flex items-center gap-2.5"><Database className="h-5 w-5 text-saffron-400" /> PostgreSQL + Qdrant</p>
-            <p className="flex items-center gap-2.5"><Zap className="h-5 w-5 text-saffron-400" /> OpenRouter embeddings</p>
+            <p className="flex items-center gap-2.5"><BookOpen className="h-5 w-5 text-saffron-400" /> An indexed law library</p>
+            <p className="flex items-center gap-2.5"><Database className="h-5 w-5 text-saffron-400" /> Secure case records</p>
+            <p className="flex items-center gap-2.5"><ShieldCheck className="h-5 w-5 text-saffron-400" /> Answers quote the Act</p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            <TechTag>PostgreSQL</TechTag>
+            <TechTag>Qdrant search</TechTag>
           </div>
         </GlowBox>
       </div>
 
       <p className="mt-10 text-center text-lg text-navy-200">
-        Every legal answer grounded in indexed statutory text — MSMED Act 2006,
-        MSEFC rules, Mediation Act, Supreme Court judgments
+        The law library holds the MSMED Act 2006, MSEFC rules, the Mediation
+        Act, and Supreme Court judgments — the assistant quotes the law, it
+        never invents it
       </p>
     </div>
   );
@@ -453,7 +481,7 @@ function MetricsSlide() {
       <div className="mt-10 grid grid-cols-4 gap-5">
         {[
           ["3–5s", "WhatsApp agent replies (typing indicator live throughout)"],
-          ["~12s", "full voice turn: STT → LLM → TTS, stages measured & optimized"],
+          ["~12s", "full voice turn — hear, understand, reply — every stage measured"],
           ["208", "statutory chunks indexed from 8 legal documents"],
           ["< ₹2k/mo", "entire platform footprint — runs in 1.5GB RAM"],
         ].map(([v, l]) => (
@@ -492,8 +520,8 @@ function MetricsSlide() {
 
 function ResilienceSlide() {
   const items = [
-    [GitBranch, "Model-agnostic — proven, not promised", "Our LLM provider retired a model mid-build week. We swapped to its successor with one config line and zero downtime."],
-    [MessageSquare, "Survives platform shifts", "WhatsApp's new privacy identities (LIDs) broke most bots this year — ODRMitra maps them transparently."],
+    [GitBranch, "Swappable AI — proven, not promised", "Our AI provider retired a model mid-build week. We switched to its successor the same day with a one-line change and zero downtime."],
+    [MessageSquare, "Survives platform shifts", "WhatsApp changed how it identifies users this year, silently breaking most bots — ODRMitra handles the change transparently."],
     [Zap, "Zero data loss", "Every answer is saved the moment it's given. A dropped call or dead battery never costs the filer their progress."],
     [Users, "Two-sided by design", "The same person can be seller in one case and buyer in another — the agent always knows which hat you're wearing."],
   ];
