@@ -471,6 +471,10 @@ export default function FileCasePage() {
 
   // ─── Recording with VAD ───
   const startRecording = useCallback(async () => {
+    // Never arm the mic on a stopped conversation — Stop is often clicked just
+    // as the agent finishes speaking, when a listen-restart is already pending.
+    if (!conversationActiveRef.current || stoppingRef.current) return;
+
     if (responseAudioRef.current && !responseAudioRef.current.paused) {
       responseAudioRef.current.pause();
       responseAudioRef.current.currentTime = 0;
@@ -480,6 +484,12 @@ export default function FileCasePage() {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
+      // Stop may have been clicked while the mic was being acquired.
+      if (!conversationActiveRef.current || stoppingRef.current) {
+        stream.getTracks().forEach((t) => t.stop());
+        setPhase("idle");
+        return;
+      }
       streamRef.current = stream;
 
       const ctx = new AudioContext();
@@ -708,13 +718,13 @@ export default function FileCasePage() {
     if (conversationActiveRef.current) {
       // Conversation is running — stop it
       stopConversation();
-    } else {
-      // Start continuous conversation loop
+    } else if (phase !== "finalizing") {
+      // Start continuous conversation loop (never during the save/redirect)
       conversationActiveRef.current = true;
       setConversationActive(true);
       startRecording();
     }
-  }, [stopConversation, startRecording]);
+  }, [stopConversation, startRecording, phase]);
 
   const startSession = async () => {
     setActive(true);
@@ -960,7 +970,8 @@ export default function FileCasePage() {
           {/* Mic / Stop button */}
           <button
             onClick={toggleMic}
-            className={`mt-4 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ${
+            disabled={phase === "finalizing"}
+            className={`mt-4 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
               conversationActive
                 ? "bg-red-600 text-white shadow-lg shadow-red-500/30 hover:bg-red-700"
                 : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
