@@ -425,66 +425,46 @@ function JourneySlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>2 · Architecture — ODR Workflow Coverage</Kicker>
-      <SlideTitle>The Section 18 journey, working end to end</SlideTitle>
+      <SlideTitle>AI runs the filing — humans keep the judgment</SlideTitle>
 
       <div className="mt-10 grid grid-cols-2 gap-6">
         <GlowBox>
-          <p className="flex items-center gap-2 text-lg font-semibold text-white">
-            <Zap className="h-5 w-5 text-[#d9b36a]" /> Steps 1–7 · AI-active
+          <p className="flex items-center gap-2.5 text-xl font-semibold text-white">
+            <Zap className="h-5 w-5 text-[#d9b36a]" /> Steps 1–7 · the assistant handles
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[15px] text-[#cbd4e2]">
+          <div className="mt-5 space-y-3.5 text-lg text-[#cbd4e2]">
             {[
-              "Registration (Udyam)",
-              "Statement of Claim",
-              "Buyer intimation",
-              "Statement of Defense",
-              "Pre-MSEFC settlement",
-              "AI outcome prediction",
-              "Unmanned negotiation",
-              "Settlement drafting",
+              "File the claim — by voice",
+              "Notify the buyer — Section 18 intimation",
+              "Record the buyer's defense — in chat",
+              "Predict, negotiate, settle",
             ].map((s) => (
-              <p key={s} className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-green-400" /> {s}
+              <p key={s} className="flex items-center gap-2.5">
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" /> {s}
               </p>
             ))}
           </div>
         </GlowBox>
 
-        <div className="space-y-4">
-          <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
-            <p className="text-lg font-semibold text-white">
-              💬 SOD filed inside WhatsApp chat
-            </p>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-[#cbd4e2]">
-              The buyer states their side in plain language — the agent records
-              a structured defense (admit / partial / deny + amount) and
-              notifies the seller. No forms, no login.
-            </p>
-          </GlowBox>
-          <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
-            <p className="text-lg font-semibold text-white">
-              ⏱️ Ex-parte auto-advance
-            </p>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-[#cbd4e2]">
-              Buyer silent past the statutory window? The case advances
-              automatically with an ex-parte record —{" "}
-              <span className="font-semibold text-white">
-                a non-cooperating party can never stall justice
-              </span>.
-            </p>
-          </GlowBox>
-        </div>
+        <GlowBox>
+          <p className="flex items-center gap-2.5 text-xl font-semibold text-white">
+            <Users className="h-5 w-5 text-[#d9b36a]" /> Steps 8–16 · human authorities
+          </p>
+          <p className="mt-5 text-lg leading-relaxed text-[#a3aec3]">
+            MSEFC reference, conciliation, arbitration — the platform tracks
+            the case and keeps both parties informed.
+          </p>
+          <p className="mt-4 text-lg font-medium text-white">
+            It never decides for a judge.
+          </p>
+        </GlowBox>
       </div>
 
-      <p className="mt-6 text-center text-lg text-[#a3aec3]">
-        Steps 8–16 (MSEFC, conciliation, arbitration) tracked on the dashboard —
-        humans decide, the platform keeps everyone informed
-      </p>
-      <p className="mt-3 text-center text-[15px] text-[#76839f]">
-        PoC scope: exact document requirements, MSEFC formats, and state-level
-        variations will be refined with the Ministry in Stage 1 — the
-        architecture absorbs them without redesign
-      </p>
+      <div className="mt-6 rounded-2xl border border-[#c9a45c]/40 bg-[#c9a45c]/10 px-6 py-4 text-center text-lg text-[#cbd4e2]">
+        ⏱️ Buyer stays silent? After the statutory window the case advances{" "}
+        <span className="font-semibold text-white">ex-parte, automatically</span>{" "}
+        — a non-cooperating party can never stall justice.
+      </div>
     </div>
   );
 }
