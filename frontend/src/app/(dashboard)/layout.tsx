@@ -78,13 +78,15 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-navy-600 text-white transition-transform lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-gradient-to-b from-navy-600 via-navy-700 to-navy-800 text-white transition-transform lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-navy-500 px-5">
-          <Scale className="h-7 w-7 text-saffron-400" />
+        <div className="flex h-16 items-center gap-3 border-b border-navy-500/60 px-5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-saffron-400 to-saffron-600 shadow-md shadow-saffron-500/30">
+            <Scale className="h-5 w-5 text-white" />
+          </div>
           <div>
             <span className="text-lg font-bold tracking-tight">ODRMitra</span>
             <span className="ml-1 text-xs text-navy-200">ओडीआर मित्र</span>
@@ -107,13 +109,16 @@ export default function DashboardLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                   active
-                    ? "bg-navy-500 text-white"
-                    : "text-navy-100 hover:bg-navy-500/50 hover:text-white"
+                    ? "bg-navy-500/80 text-white shadow-inner"
+                    : "text-navy-100 hover:bg-navy-500/40 hover:text-white"
                 }`}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                {active && (
+                  <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-saffron-400" />
+                )}
+                <Icon className={`h-5 w-5 shrink-0 ${active ? "text-saffron-300" : ""}`} />
                 {item.label}
                 {active && (
                   <ChevronRight className="ml-auto h-4 w-4 text-saffron-400" />
