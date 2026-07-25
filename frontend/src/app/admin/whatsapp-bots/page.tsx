@@ -147,6 +147,12 @@ export default function WhatsAppBotsPage() {
               onClick={() => {
                 if (pollRef.current) clearInterval(pollRef.current);
                 setPolling(false);
+                // Tear down the pending session server-side too — otherwise
+                // baileys keeps retrying and the dead bot row lingers.
+                api
+                  .adminDisconnectBot(qrData.bot_id)
+                  .then(() => loadBots())
+                  .catch(() => {});
                 setQrData(null);
               }}
               className="text-xs text-gray-500 hover:text-gray-700"

@@ -191,7 +191,7 @@ async def get_bot_status(bot_id: str, admin_id: RequireAdmin, db: DBSession):
 
 @router.post("/bots/{bot_id}/disconnect")
 async def disconnect_bot(bot_id: str, admin_id: RequireAdmin, db: DBSession):
-    """Disconnect a WhatsApp bot."""
+    """Disconnect a WhatsApp bot. Bots that never paired are deleted entirely."""
     bot = await _get_bot(db, bot_id, admin_id)
 
     try:
@@ -208,7 +208,11 @@ async def disconnect_bot(bot_id: str, admin_id: RequireAdmin, db: DBSession):
     except Exception:
         pass
 
-    bot.status = "disconnected"
+    if not bot.phone_number:
+        # Never scanned — a cancelled connect attempt, not a real bot.
+        await db.delete(bot)
+    else:
+        bot.status = "disconnected"
     return {"success": True}
 
 

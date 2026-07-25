@@ -63,12 +63,17 @@ export async function startSession(userId) {
   const { version, isLatest } = await fetchLatestBaileysVersion();
   logger.info(`Using WA version: ${version.join('.')}, isLatest: ${isLatest}`);
 
+  // Carry the reconnect counter across restarts (startSession re-creates the
+  // entry on every reconnect attempt); reset only on a successful open.
+  const prevAttempts = sessions.get(userId)?.reconnectAttempts || 0;
+
   sessions.set(userId, {
     socket: null,
     qr: null,
     qrBase64: null,
     status: 'connecting',
     phoneNumber: null,
+    reconnectAttempts: prevAttempts,
   });
 
   const socket = makeWASocket({
@@ -91,6 +96,10 @@ export async function startSession(userId) {
     const { connection, lastDisconnect, qr } = update;
     const session = sessions.get(userId);
 
+    // Session was disconnected/reset while the socket was closing — do not
+    // touch state or schedule a reconnect for a session that no longer exists.
+    if (!session) return;
+
     logger.info(`Connection update for user ${userId}:`, { connection, qr: qr ? 'present' : 'none' });
 
     if (qr) {
@@ -111,9 +120,20 @@ export async function startSession(userId) {
 
       logger.info(`Connection closed for user ${userId}. Status: ${statusCode}. Error: ${errorMessage}`);
 
-      const shouldReconnect = statusCode !== DisconnectReason.loggedOut &&
-                              statusCode !== DisconnectReason.forbidden &&
-                              statusCode !== 405;
+      let shouldReconnect = statusCode !== DisconnectReason.loggedOut &&
+                            statusCode !== DisconnectReason.forbidden &&
+                            statusCode !== 405;
+
+      // A session that never paired (QR not scanned) must not retry forever —
+      // cancelled connect attempts otherwise reconnect-loop indefinitely.
+      const registered = !!state.creds?.registered;
+      if (shouldReconnect && !registered) {
+        session.reconnectAttempts = (session.reconnectAttempts || 0) + 1;
+        if (session.reconnectAttempts > 3) {
+          logger.info(`Giving up on unpaired session ${userId} after ${session.reconnectAttempts - 1} retries`);
+          shouldReconnect = false;
+        }
+      }
 
       if (shouldReconnect) {
         session.status = 'reconnecting';
@@ -133,6 +153,7 @@ export async function startSession(userId) {
       session.phoneNumber = phoneNumber;
       session.qr = null;
       session.qrBase64 = null;
+      session.reconnectAttempts = 0;
 
       logger.info(`Connected for user ${userId}. Phone: ${phoneNumber}`);
       notifyBackend(userId, 'connected', { phoneNumber });
@@ -147,6 +168,16 @@ export async function startSession(userId) {
     for (const msg of messages) {
       if (msg.key.fromMe) continue;
       if (!msg.message) continue;
+
+      // Only handle direct 1:1 chats — never status updates, groups,
+      // newsletters, or broadcast lists (the agent would reply to them).
+      const jid = msg.key.remoteJid || '';
+      if (
+        jid === 'status@broadcast' ||
+        jid.endsWith('@g.us') ||
+        jid.endsWith('@newsletter') ||
+        jid.endsWith('@broadcast')
+      ) continue;
 
       const messageText = msg.message.conversation ||
         msg.message.extendedTextMessage?.text ||
@@ -165,6 +196,10 @@ export async function startSession(userId) {
 
       logger.info(`Message from ${senderName} (${remoteJid}) to user ${userId}: ${messageText.substring(0, 50)}...`);
 
+      // Show "typing..." while the agent thinks (WhatsApp expires the
+      // indicator after ~10s, so refresh it until the reply is sent).
+      startTyping(userId, remoteJid);
+
       await forwardMessageToBackend(userId, {
         from: senderNumber,
         fromName: senderName,
@@ -180,6 +215,37 @@ export async function startSession(userId) {
     status: 'connecting',
     message: 'Session starting, QR code will be available shortly',
   };
+}
+
+// Active typing-indicator refreshers: `${userId}|${jid}` -> interval handle
+const typingTimers = new Map();
+
+function startTyping(userId, jid) {
+  const key = `${userId}|${jid}`;
+  stopTyping(userId, jid);
+
+  const send = async () => {
+    const session = sessions.get(userId);
+    if (!session?.socket || session.status !== 'connected') {
+      stopTyping(userId, jid);
+      return;
+    }
+    try { await session.socket.sendPresenceUpdate('composing', jid); } catch (e) { /* ignore */ }
+  };
+
+  send();
+  typingTimers.set(key, setInterval(send, 8000));
+  // Safety stop in case the agent never replies
+  setTimeout(() => stopTyping(userId, jid), 180000);
+}
+
+function stopTyping(userId, jid) {
+  const key = `${userId}|${jid}`;
+  const timer = typingTimers.get(key);
+  if (timer) {
+    clearInterval(timer);
+    typingTimers.delete(key);
+  }
 }
 
 export function getSessionStatus(userId) {
@@ -202,6 +268,8 @@ export async function sendMessage(userId, to, message) {
   }
   const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
   try {
+    stopTyping(userId, jid);
+    try { await session.socket.sendPresenceUpdate('paused', jid); } catch (e) { /* ignore */ }
     await session.socket.sendMessage(jid, { text: message });
     logger.info(`Message sent to ${to} for user ${userId}`);
     return { success: true };
