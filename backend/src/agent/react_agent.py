@@ -155,14 +155,17 @@ class ReactAgent:
             from src.agent.context.loader import (
                 build_case_list_context,
                 build_dispute_context,
+                build_respondent_context,
                 build_seller_context,
                 load_dispute_context,
+                load_disputes_against_user,
                 load_seller_profile,
                 load_user_disputes,
             )
             from src.db.session import async_session_factory
 
             case_list_block = ""
+            respondent_block = ""
             async with async_session_factory() as db:
                 profile = await load_seller_profile(self.user_id, db)
                 dispute_info = (
@@ -172,13 +175,17 @@ class ReactAgent:
                 )
                 if self.channel == "whatsapp":
                     # WhatsApp users navigate by chat alone — give the agent
-                    # every complaint so it can offer them as options.
+                    # every complaint on BOTH sides: filed by them, and filed
+                    # against them (so "kya mere khilaf complaint hai?" works).
                     disputes = await load_user_disputes(self.user_id, db)
                     case_list_block = build_case_list_context(disputes)
+                    against = await load_disputes_against_user(self.user_id, db)
+                    respondent_block = build_respondent_context(against)
 
             blocks = [
                 build_seller_context(profile),
                 case_list_block,
+                respondent_block,
                 build_dispute_context(dispute_info),
             ]
             return "\n\n".join(b for b in blocks if b)

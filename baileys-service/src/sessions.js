@@ -188,10 +188,28 @@ export async function startSession(userId) {
       if (!messageText) continue;
 
       const remoteJid = msg.key.remoteJid || '';
-      const senderNumber = remoteJid
+
+      // WhatsApp privacy LIDs: remoteJid can be <lid>@lid instead of the
+      // phone JID. The real number travels alongside in senderPn (or
+      // participantPn); prefer it so the sender maps to their actual mobile
+      // (and to any case filed against that number). Replies still go to
+      // remoteJid, which WhatsApp requires for LID chats.
+      let phoneJid = remoteJid;
+      if (remoteJid.endsWith('@lid')) {
+        const alt = msg.key.senderPn || msg.key.participantPn || msg.key.participant || '';
+        if (alt.endsWith('@s.whatsapp.net')) {
+          phoneJid = alt;
+          logger.info(`LID chat ${remoteJid} mapped to phone JID ${alt}`);
+        } else {
+          logger.warn(`LID chat ${remoteJid} has no phone JID (senderPn missing) — using LID as identity`);
+        }
+      }
+
+      const senderNumber = phoneJid
         .replace('@s.whatsapp.net', '')
         .replace('@g.us', '')
-        .replace('@lid', '');
+        .replace('@lid', '')
+        .split(':')[0];
       const senderName = msg.pushName || senderNumber;
 
       logger.info(`Message from ${senderName} (${remoteJid}) to user ${userId}: ${messageText.substring(0, 50)}...`);

@@ -33,6 +33,9 @@ Classify the user's latest message into exactly one intent:
 - "existing_complaint": the user asks about an already-filed complaint —
   status, next steps, selecting from the complaint menu (a bare number like
   "1" or "2"), providing missing details for an existing case, or documents.
+  ALSO: questions about complaints filed AGAINST the user ("kya mere khilaf
+  koi complaint hai?", responding to an intimation notice, submitting their
+  defense or settlement offer as the buyer/respondent).
   Greetings (hi/hello/namaste/menu) also go here — the menu is shown.
 - "general": general legal or process questions not tied to a specific case
   (e.g. "Section 16 kya hai?", "MSEFC kya hota hai?", "interest kitna lagta hai?").

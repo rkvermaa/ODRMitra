@@ -8,6 +8,12 @@ from src.tools.base import BaseTool
 from src.core.logging import log
 
 
+def _norm_mobile(number: str | None) -> str:
+    """Strip '+' and a leading 91 country code for comparison."""
+    digits = (number or "").lstrip("+")
+    return digits[2:] if digits.startswith("91") and len(digits) == 12 else digits
+
+
 class LookupCasesTool(BaseTool):
     """Look up existing disputes for a user by mobile number or case number."""
 
@@ -49,24 +55,29 @@ class LookupCasesTool(BaseTool):
                 )
                 disputes = result.scalars().all()
             else:
-                # Look up by mobile number — find user first
+                # Both directions: cases this number FILED (as claimant) and
+                # cases filed AGAINST this number (as respondent). Respondents
+                # are often not registered users, so match respondent_mobile
+                # directly, with and without the 91 country code.
+                variants = {mobile}
+                if mobile.startswith("91") and len(mobile) == 12:
+                    variants.add(mobile[2:])
+                elif len(mobile) == 10:
+                    variants.add(f"91{mobile}")
+
                 result = await db.execute(
-                    select(User).where(User.mobile_number == mobile)
+                    select(User).where(User.mobile_number.in_(variants))
                 )
                 user = result.scalar_one_or_none()
 
-                if not user:
-                    return {
-                        "found": False,
-                        "message": f"No user found with mobile number {mobile}.",
-                        "cases": [],
-                    }
+                conditions = [Dispute.respondent_mobile.in_(variants)]
+                if user:
+                    conditions.append(Dispute.claimant_id == user.id)
 
-                # Find disputes where user is claimant
                 result = await db.execute(
-                    select(Dispute).where(
-                        Dispute.claimant_id == user.id
-                    ).order_by(Dispute.created_at.desc())
+                    select(Dispute)
+                    .where(or_(*conditions))
+                    .order_by(Dispute.created_at.desc())
                 )
                 disputes = result.scalars().all()
 
@@ -81,6 +92,12 @@ class LookupCasesTool(BaseTool):
 
             cases = []
             for d in disputes:
+                # Which side of the case is this number on?
+                is_respondent = bool(
+                    mobile and d.respondent_mobile
+                    and _norm_mobile(d.respondent_mobile) == _norm_mobile(mobile)
+                    and not (user and d.claimant_id == user.id)
+                )
                 cases.append({
                     "case_number": d.case_number,
                     "title": d.title,
@@ -90,6 +107,7 @@ class LookupCasesTool(BaseTool):
                     "category": d.category,
                     "claimed_amount": float(d.claimed_amount) if d.claimed_amount else None,
                     "respondent_name": d.respondent_name,
+                    "role_of_this_user": "respondent (complaint is AGAINST them)" if is_respondent else "claimant (they filed it)",
                     "created_at": d.created_at.isoformat() if d.created_at else None,
                 })
 

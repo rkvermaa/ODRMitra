@@ -118,6 +118,74 @@ async def load_user_disputes(user_id: str, db: AsyncSession) -> list[dict[str, A
     return out
 
 
+async def load_disputes_against_user(user_id: str, db: AsyncSession) -> list[dict[str, Any]]:
+    """Disputes where this user is the RESPONDENT (filed against their mobile)."""
+    from src.db.models.dispute import Dispute
+    from src.db.models.user import User
+
+    try:
+        user = (
+            await db.execute(select(User).where(User.id == user_id))
+        ).scalar_one_or_none()
+        if not user or not user.mobile_number:
+            return []
+
+        digits = user.mobile_number.lstrip("+")
+        variants = {digits}
+        if digits.startswith("91") and len(digits) == 12:
+            variants.add(digits[2:])
+        elif len(digits) == 10:
+            variants.add(f"91{digits}")
+
+        result = await db.execute(
+            select(Dispute)
+            .where(
+                (Dispute.respondent_mobile.in_(variants))
+                | (Dispute.respondent_id == user.id)
+            )
+            .order_by(Dispute.created_at.desc())
+        )
+        disputes = result.scalars().all()
+    except Exception as e:
+        log.error(f"Failed to load disputes against user: {e}")
+        return []
+
+    return [
+        {
+            "id": str(d.id),
+            "case_number": d.case_number,
+            "title": d.title or "",
+            "status": d.status or "",
+            "claimed_amount": str(d.claimed_amount) if d.claimed_amount else "",
+            "claimant_id": str(d.claimant_id),
+        }
+        for d in disputes
+    ]
+
+
+def build_respondent_context(disputes: list[dict[str, Any]]) -> str:
+    """Block listing complaints FILED AGAINST this user (they are the buyer)."""
+    if not disputes:
+        return ""
+
+    parts = [
+        f"## COMPLAINTS FILED AGAINST THIS USER ({len(disputes)} total)",
+        "This user is the RESPONDENT (buyer) in these cases. If they ask",
+        '"kya mere khilaf koi complaint hai?" the answer is YES — share the',
+        "case details, explain their Section 18 options (respond within 15",
+        "days, submit their side / Statement of Defense, or propose a",
+        "settlement), and offer to record their response.",
+    ]
+    for i, d in enumerate(disputes, 1):
+        stage = STATUS_LABELS.get(d["status"], d["status"])
+        line = f"{i}. {d['case_number']} — {d['title']}"
+        if d["claimed_amount"]:
+            line += f" | Claimed: ₹{d['claimed_amount']}"
+        line += f" | Stage: {stage} | dispute_id: {d['id']}"
+        parts.append(line)
+    return "\n".join(parts)
+
+
 def build_case_list_context(disputes: list[dict[str, Any]]) -> str:
     """Numbered list of the user's complaints for prompt injection."""
     if not disputes:

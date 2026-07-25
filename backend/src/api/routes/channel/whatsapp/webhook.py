@@ -377,6 +377,11 @@ async def process_whatsapp_message(
                 channel_source="whatsapp",
             )
 
+            # Commit before the agent runs: its context loaders use their own
+            # DB session and must see a just-created sender (first message
+            # from a new number) to recognize cases filed against them.
+            await db.commit()
+
             # Get conversation history
             history = await chat.get_history_for_agent(session.id)
 
