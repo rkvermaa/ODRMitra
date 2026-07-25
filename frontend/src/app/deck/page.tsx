@@ -121,7 +121,7 @@ function TitleSlide() {
 function ProblemSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>The Problem</Kicker>
+      <Kicker>1 · Overview — The Problem</Kicker>
       <SlideTitle>India&apos;s MSMEs are owed a fortune they can&apos;t collect</SlideTitle>
 
       <div className="mt-12 grid grid-cols-3 gap-6">
@@ -158,7 +158,7 @@ function ProblemSlide() {
 function SolutionSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>The Solution</Kicker>
+      <Kicker>1 · Overview — The Solution</Kicker>
       <SlideTitle>
         File a dispute by{" "}
         <span className="bg-gradient-to-r from-[#eedbaa] to-[#c9a45c] bg-clip-text text-transparent">
@@ -207,7 +207,7 @@ function DemoMapSlide() {
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Live Demo</Kicker>
+      <Kicker>4 · Live Demonstration</Kicker>
       <SlideTitle>Watch a real dispute travel both directions</SlideTitle>
 
       <div className="mt-10 grid grid-cols-4 gap-4">
@@ -261,7 +261,7 @@ function DemoHighlightsSlide() {
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Demo Highlights</Kicker>
+      <Kicker>4 · Live Demonstration — Highlights</Kicker>
       <SlideTitle>Six moments to watch for</SlideTitle>
 
       <div className="mt-10 grid grid-cols-3 gap-5">
@@ -295,7 +295,7 @@ function TechTag({ children }: { children: React.ReactNode }) {
 function ArchitectureSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>How It Works</Kicker>
+      <Kicker>2 · Solution Architecture</Kicker>
       <SlideTitle>One assistant listens, thinks in law, and acts</SlideTitle>
 
       <div className="mt-10 grid grid-cols-[1fr_auto_1.3fr_auto_1fr] items-stretch gap-4">
@@ -310,7 +310,8 @@ function ArchitectureSlide() {
             <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-[#d9b36a]" /> A simple website</p>
           </div>
           <div className="mt-4 flex flex-wrap gap-1.5">
-            <TechTag>Sarvam AI voice</TechTag>
+            <TechTag>Sarvam saarika (STT)</TechTag>
+            <TechTag>Sarvam bulbul (TTS)</TechTag>
             <TechTag>Next.js</TechTag>
           </div>
         </GlowBox>
@@ -325,7 +326,7 @@ function ArchitectureSlide() {
           <p className="mt-2 text-[15px] leading-relaxed text-[#cbd4e2]">
             One assistant understands the conversation and acts only through{" "}
             <span className="font-semibold text-white">
-              12 approved legal actions
+              14 approved legal actions
             </span>{" "}
             — file the case, notify the buyer, record the defense, predict the
             outcome, calculate interest, draft the settlement.
@@ -337,7 +338,7 @@ function ArchitectureSlide() {
           </p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             <TechTag>LangChain agent</TechTag>
-            <TechTag>DeepSeek LLM</TechTag>
+            <TechTag>DeepSeek LLM (API)</TechTag>
             <TechTag>FastAPI</TechTag>
           </div>
         </GlowBox>
@@ -356,7 +357,8 @@ function ArchitectureSlide() {
           </div>
           <div className="mt-4 flex flex-wrap gap-1.5">
             <TechTag>PostgreSQL</TechTag>
-            <TechTag>Qdrant search</TechTag>
+            <TechTag>Qdrant vector search</TechTag>
+            <TechTag>OpenRouter embeddings</TechTag>
           </div>
         </GlowBox>
       </div>
@@ -379,7 +381,7 @@ function PipelineSlide() {
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>The Signature Pipeline</Kicker>
+      <Kicker>2 · Architecture — System Workflow</Kicker>
       <SlideTitle>From a voice call to a living WhatsApp case</SlideTitle>
 
       <div className="mt-10 grid grid-cols-4 gap-4">
@@ -422,7 +424,7 @@ function PipelineSlide() {
 function JourneySlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>What the PoC Demonstrates</Kicker>
+      <Kicker>2 · Architecture — ODR Workflow Coverage</Kicker>
       <SlideTitle>The Section 18 journey, working end to end</SlideTitle>
 
       <div className="mt-10 grid grid-cols-2 gap-6">
@@ -488,18 +490,19 @@ function JourneySlide() {
 }
 
 function CapabilitiesSlide() {
+  // Card titles mirror the Problem Statement 1 use-case clauses verbatim.
   const caps = [
-    [Mic, "Voice-based filing", "Multilingual conversation auto-populates the SOC"],
-    [FileSearch, "Document analysis", "Entities, amounts, dates extracted from invoices & POs"],
-    [Layers, "Dispute classification", "Sub-category with confidence, per MSMED context"],
-    [FileSearch, "Missing-doc detection", "Gap check against category requirements"],
-    [TrendingUp, "Outcome prediction (DGP)", "Statutory-grounded probability & settlement range"],
-    [Calculator, "Negotiation + settlement", "Section 16 interest math & agreement drafting"],
+    [Mic, "Voice-based inputs, automated form-population", "Speak in Hindi/English/Hinglish — the Statement of Claim fills itself"],
+    [FileSearch, "Analysing claims & supporting documentation", "Amounts, dates, and parties extracted from what is filed"],
+    [Layers, "Sub-category classification & missing-document detection", "Each case typed with confidence; documentation gaps flagged"],
+    [TrendingUp, "Predicting probable resolution outcomes", "Grounded in statutory provisions and precedent, with a settlement range"],
+    [MessageSquare, "Multilingual, real-time AI-guided negotiation", "Both parties, one assistant, on the channel they already use"],
+    [FileSignature, "Automated drafting of settlement agreements", "Section 16 interest computed; agreement delivered to both parties"],
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Problem Statement · Use Case Mapping</Kicker>
-      <SlideTitle>All six asked-for capabilities, working in the PoC</SlideTitle>
+      <Kicker>1 · Overview — Alignment with the Use Case</Kicker>
+      <SlideTitle>The use case&apos;s six asks, working in the PoC</SlideTitle>
 
       <div className="mt-10 grid grid-cols-3 gap-5">
         {caps.map(([Icon, title, desc]) => {
@@ -529,16 +532,74 @@ function CapabilitiesSlide() {
   );
 }
 
+function DatasetsSlide() {
+  return (
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>3 · Datasets & Methodology</Kicker>
+      <SlideTitle>Grounded in law, validated against real cases</SlideTitle>
+
+      <div className="mt-10 grid grid-cols-2 gap-6">
+        <GlowBox>
+          <p className="flex items-center gap-2.5 text-lg font-semibold text-white">
+            <Database className="h-5 w-5 shrink-0 text-[#d9b36a]" /> Datasets
+          </p>
+          <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-[#a3aec3]">
+            <li>
+              <span className="font-semibold text-white">Statutory corpus (indexed):</span>{" "}
+              MSMED Act 2006, MSEFC rules & draft revisions, Mediation Act,
+              Arbitration & Conciliation Act, Supreme Court MSME judgments —
+              208 searchable sections from 8 documents
+            </li>
+            <li>
+              <span className="font-semibold text-white">Case data (PoC):</span>{" "}
+              synthetic and volunteer-filed disputes exercised across all three
+              channels
+            </li>
+            <li>
+              <span className="font-semibold text-white">Stage 1:</span>{" "}
+              validation against AIKosh MSME-SAMADHAAN datasets, with published
+              methodology
+            </li>
+          </ul>
+        </GlowBox>
+
+        <GlowBox>
+          <p className="flex items-center gap-2.5 text-lg font-semibold text-white">
+            <GitBranch className="h-5 w-5 shrink-0 text-[#d9b36a]" /> Methodology
+          </p>
+          <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-[#a3aec3]">
+            <li>
+              <span className="font-semibold text-white">Retrieval-grounded answers:</span>{" "}
+              legal responses are retrieved from the indexed Acts and quoted —
+              never generated from memory
+            </li>
+            <li>
+              <span className="font-semibold text-white">Deterministic statutory math:</span>{" "}
+              Section 16 compound interest is computed by formula, not
+              estimated by AI
+            </li>
+            <li>
+              <span className="font-semibold text-white">Tool-scoped agent:</span>{" "}
+              every action flows through one of 14 approved, auditable legal
+              actions with verified outcomes
+            </li>
+          </ul>
+        </GlowBox>
+      </div>
+    </div>
+  );
+}
+
 function ComplianceSlide() {
   const points = [
-    [ShieldCheck, "Scoped tools, never raw data access", "The agent acts only through 12 audited tools — it cannot query the database freely or touch another user's case. By design, not by prompt."],
+    [ShieldCheck, "Scoped tools, never raw data access", "The agent acts only through 14 audited tools — it cannot query the database freely or touch another user's case. By design, not by prompt."],
     [Users, "Humans own the judgment calls", "AI drives steps 1–7 (filing & facilitation); MSEFC, conciliation, and arbitration (8–16) stay entirely with human authorities."],
     [BookOpen, "Grounded, not generative law", "Every statutory answer is retrieved from indexed Act text — the model cites provisions, it doesn't invent them."],
     [FileSignature, "Verified, auditable actions", "Intimations and defenses are delivery-verified and timestamped; the agent may never claim an action it didn't complete."],
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Responsible AI · DPDP Act 2023</Kicker>
+      <Kicker>3 · Methodology — Responsible AI · DPDP Act 2023</Kicker>
       <SlideTitle>Trustworthy by architecture</SlideTitle>
 
       <div className="mt-10 grid grid-cols-2 gap-5">
@@ -574,7 +635,7 @@ function ResilienceSlide() {
   ];
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Engineering Depth</Kicker>
+      <Kicker>3 · Methodology — Engineering Robustness</Kicker>
       <SlideTitle>Built to survive the real world</SlideTitle>
 
       <div className="mt-10 grid grid-cols-2 gap-5">
@@ -599,7 +660,7 @@ function ResilienceSlide() {
 function RoadmapSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Roadmap & Cost</Kicker>
+      <Kicker>Roadmap</Kicker>
       <SlideTitle>From working PoC to national scale</SlideTitle>
 
       <div className="mt-10 grid grid-cols-3 gap-5">
@@ -672,17 +733,21 @@ function ClosingSlide() {
 }
 
 const SLIDES: React.ComponentType[] = [
+  // Ordered to mirror the PMU's requested structure:
+  // 1 Overview & use-case alignment · 2 Architecture & workflow ·
+  // 3 Datasets & methodology · 4 Live demonstration
   TitleSlide,
   ProblemSlide,
   SolutionSlide,
-  DemoMapSlide,
+  CapabilitiesSlide,
   ArchitectureSlide,
   PipelineSlide,
   JourneySlide,
-  CapabilitiesSlide,
+  DatasetsSlide,
   ComplianceSlide,
   ResilienceSlide,
   RoadmapSlide,
+  DemoMapSlide,
   DemoHighlightsSlide,
   ClosingSlide,
 ];
