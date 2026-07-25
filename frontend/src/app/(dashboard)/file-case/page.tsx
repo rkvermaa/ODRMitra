@@ -260,6 +260,20 @@ export default function FileCasePage() {
     form.append("text", text);
     form.append("lang_code", langCode);
     const res = await fetch("/api/v1/voice/tts", { method: "POST", body: form });
+    // Stop may have been clicked while TTS was being generated — never start
+    // speaking on a stopped conversation.
+    if (!conversationActiveRef.current || stoppingRef.current) {
+      if (pendingAssistantMsgRef.current) {
+        const msg = pendingAssistantMsgRef.current;
+        pendingAssistantMsgRef.current = null;
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: msg, timestamp: Date.now() },
+        ]);
+      }
+      setPhase("idle");
+      return;
+    }
     if (!res.ok) {
       setPhase("idle");
       return;
