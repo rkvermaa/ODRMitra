@@ -34,7 +34,7 @@ DEMO_USERS = [
         "mobile_number": "9024987286",
         "name": "Gaurav Saini",
         "email": "gaurav@aitechnology.in",
-        "role": UserRole.RESPONDENT.value,
+        "role": UserRole.CLAIMANT.value,
         "organization_name": "AI Technology",
         "udyam_registration": "UDYAM-RJ-02-0067890",
         "address": "18, Bhilwara Industrial Zone, Rajasthan",
