@@ -36,6 +36,11 @@ embedding_model = "openai/text-embedding-3-small"
 embedding_dimension = 1536
 openrouter_base_url = "https://openrouter.ai/api/v1"
 
+# Voice
+# STT language bias — hi-IN covers Hindi/English/Hinglish (code-mixed);
+# full auto-detect ("unknown") misreads short clips as other languages.
+voice_stt_language = "hi-IN"
+
 # ODR Workflow
 # Days the respondent has to file their SOD after intimation (Section 18).
 # Statutory default 15; lower it to demo the ex-parte auto-advance live.

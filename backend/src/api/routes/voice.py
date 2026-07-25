@@ -37,12 +37,18 @@ async def speech_to_text(file: UploadFile = File(...)):
 
     log.info(f"STT: received {len(audio_data)} bytes")
 
+    # Bias recognition to hi-IN instead of full auto-detect: the product
+    # supports Hindi/English/Hinglish only, and "unknown" occasionally
+    # misreads short clips as Malayalam/Tamil/etc. Saarika transcribes
+    # Hindi-English code-mixed speech natively under hi-IN.
+    stt_language = settings.get("VOICE_STT_LANGUAGE", "hi-IN")
+
     async with httpx.AsyncClient(timeout=90) as client:
         resp = await client.post(
             SARVAM_STT_URL,
             headers={"api-subscription-key": SARVAM_API_KEY},
             files={"file": ("input.wav", audio_data, "audio/wav")},
-            data={"model": "saarika:v2.5", "language_code": "unknown"},
+            data={"model": "saarika:v2.5", "language_code": stt_language},
         )
 
     if resp.status_code != 200:
