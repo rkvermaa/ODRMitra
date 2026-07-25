@@ -178,9 +178,17 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="relative flex items-center gap-2 text-xs text-navy-300">
-          <Shield className="h-4 w-4" />
-          IndiaAI Innovation Challenge 2026 — Ministry of MSME
+        <div className="relative flex items-center justify-between text-xs text-navy-300">
+          <span className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            IndiaAI Innovation Challenge 2026 — Ministry of MSME
+          </span>
+          <a
+            href="/deck"
+            className="rounded-full border border-navy-400/40 px-3 py-1 font-medium text-navy-200 transition-colors hover:border-saffron-400/60 hover:text-saffron-300"
+          >
+            Pitch Deck →
+          </a>
         </div>
       </div>
 
