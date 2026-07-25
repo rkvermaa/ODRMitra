@@ -126,6 +126,7 @@ class DisputeResponse(BaseModel):
     ai_missing_docs: dict | None
     ai_outcome_prediction: dict | None
     # Meta
+    intimation_sent_at: str | None
     claimant_id: str
     respondent_id: str | None
     created_at: str
@@ -178,6 +179,7 @@ def _dispute_to_response(d: Dispute) -> DisputeResponse:
         ai_classification=d.ai_classification,
         ai_missing_docs=d.ai_missing_docs,
         ai_outcome_prediction=d.ai_outcome_prediction,
+        intimation_sent_at=d.intimation_sent_at.isoformat() if d.intimation_sent_at else None,
         claimant_id=str(d.claimant_id),
         respondent_id=str(d.respondent_id) if d.respondent_id else None,
         created_at=d.created_at.isoformat(),
@@ -204,6 +206,45 @@ async def list_disputes(user_id: CurrentUserId, db: DBSession):
     )
     disputes = result.scalars().all()
     return [_dispute_to_response(d) for d in disputes]
+
+
+@router.post("/{dispute_id}/intimation")
+async def send_intimation(
+    dispute_id: str,
+    user_id: CurrentUserId,
+    db: DBSession,
+):
+    """Send (or resend) the Section 18 intimation for an existing case.
+
+    Covers cases filed before intimation wiring existed, dispatch failures,
+    and cases whose buyer mobile was added after filing.
+    """
+    result = await db.execute(
+        select(Dispute).where(
+            Dispute.id == dispute_id, Dispute.claimant_id == user_id
+        )
+    )
+    dispute = result.scalar_one_or_none()
+    if not dispute:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Dispute not found"
+        )
+    if not dispute.respondent_mobile:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No respondent mobile on this case — add it first",
+        )
+
+    import asyncio
+
+    from src.tasks.dispatcher import dispatch_buyer_and_seller_intimation
+
+    asyncio.create_task(
+        dispatch_buyer_and_seller_intimation(
+            dispute_id=str(dispute.id), user_id=user_id
+        )
+    )
+    return {"success": True, "message": "Intimation dispatch started"}
 
 
 @router.post("", response_model=DisputeResponse, status_code=status.HTTP_201_CREATED)

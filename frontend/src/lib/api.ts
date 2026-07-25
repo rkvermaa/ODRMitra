@@ -106,6 +106,7 @@ export interface Dispute {
   ai_classification: Record<string, unknown> | null;
   ai_missing_docs: Record<string, unknown> | null;
   ai_outcome_prediction: Record<string, unknown> | null;
+  intimation_sent_at: string | null;
   claimant_id: string;
   respondent_id: string | null;
   created_at: string;

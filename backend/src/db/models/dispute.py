@@ -133,6 +133,12 @@ class Dispute(Base):
     )
 
     # AI analysis results (stored as JSON for flexibility)
+    # When the Section 18 intimation was successfully delivered to the buyer.
+    # Kept separate from `status`, which moves on as the workflow progresses.
+    intimation_sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     ai_classification: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ai_missing_docs: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ai_outcome_prediction: Mapped[dict | None] = mapped_column(JSON, nullable=True)

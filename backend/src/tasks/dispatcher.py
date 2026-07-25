@@ -309,6 +309,10 @@ async def dispatch_buyer_intimation(
                 )
                 log.info(f"Buyer intimation sent to {buyer_mobile} for case {dispute.case_number}")
 
+                from datetime import datetime, timezone
+                dispute.intimation_sent_at = datetime.now(timezone.utc)
+                await db.commit()
+
     except Exception as e:
         log.error(f"dispatch_buyer_intimation failed: {e}")
 
@@ -426,7 +430,9 @@ async def dispatch_buyer_and_seller_intimation(dispute_id: str, user_id: str):
                     )
                     log.info(f"Buyer intimation sent to {dispute.respondent_mobile} for case {dispute.case_number}")
 
-                    # Update status to intimation_sent
+                    # Record delivery and advance the workflow stage
+                    from datetime import datetime, timezone
+                    dispute.intimation_sent_at = datetime.now(timezone.utc)
                     dispute.status = DisputeStatus.INTIMATION_SENT.value
                     await db.commit()
 
