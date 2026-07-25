@@ -17,10 +17,10 @@ from src.db.models.invoice import Invoice
 DEMO_USERS = [
     {
         "mobile_number": "7409210692",
-        "name": "Rajesh Kumar",
-        "email": "rajesh@kumar-enterprises.in",
+        "name": "Ravi Kumar Verma",
+        "email": "ravi@verma-enterprises.in",
         "role": UserRole.CLAIMANT.value,
-        "organization_name": "Kumar Enterprises",
+        "organization_name": "Verma Enterprises",
         "udyam_registration": "UDYAM-MH-01-0012345",
         "address": "Plot 45, MIDC Industrial Area, Pune, Maharashtra",
         "business_type": "small",
@@ -31,11 +31,11 @@ DEMO_USERS = [
         "pin_code": "411018",
     },
     {
-        "mobile_number": "9876543211",
-        "name": "Priya Sharma",
-        "email": "priya@sharmatextiles.in",
-        "role": UserRole.CLAIMANT.value,
-        "organization_name": "Sharma Textiles Pvt Ltd",
+        "mobile_number": "9024987286",
+        "name": "Gaurav Saini",
+        "email": "gaurav@aitechnology.in",
+        "role": UserRole.RESPONDENT.value,
+        "organization_name": "AI Technology",
         "udyam_registration": "UDYAM-RJ-02-0067890",
         "address": "18, Bhilwara Industrial Zone, Rajasthan",
         "business_type": "micro",
@@ -168,14 +168,14 @@ async def seed():
                     "3. Costs of the proceedings"
                 ),
                 correspondence_summary="Email reminders sent on 01-Oct-2025, 15-Nov-2025, 01-Jan-2026. No response received.",
-                buyer_objections=[],
+                buyer_objections=None,
                 msefc_council="MSEFC Maharashtra",
                 status=DisputeStatus.DGP.value,
             )
 
             dispute2 = Dispute(
                 case_number="ODR-2026-0002",
-                claimant_id=users["9876543211"].id,
+                claimant_id=users["7409210692"].id,
                 respondent_name="Metro Fashion House",
                 respondent_mobile="9876500000",
                 respondent_email="accounts@metrofashion.in",
