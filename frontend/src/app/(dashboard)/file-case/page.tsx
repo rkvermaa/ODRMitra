@@ -11,7 +11,7 @@ import {
   Circle,
   ArrowRight,
   Loader2,
-  Square,
+  PhoneOff,
   Volume2,
   VolumeX,
   Search,
@@ -666,39 +666,35 @@ export default function FileCasePage() {
     // Reset stopping flag after a tick (in case recorder.onstop fires async)
     setTimeout(() => { stoppingRef.current = false; }, 100);
 
-    // Auto-handoff partial data (new-case only)
-    if (mode === "new-case") {
-      const hasAnyField = Object.values(fields).some((v) => !!v);
-      if (hasAnyField) {
-        setPhase("finalizing");
-        // Build transcript from current messages
-        const transcript = messagesRef.current
-          .filter((m) => m.role === "user" || m.role === "assistant")
-          .map((m) => ({ role: m.role, content: m.content }));
+    // Save partial data in the background (new-case only) — no redirect;
+    // Stop always returns the user to the /file-case start screen.
+    if (mode === "new-case" && Object.values(fields).some((v) => !!v)) {
+      const transcript = messagesRef.current
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .map((m) => ({ role: m.role, content: m.content }));
 
-        const handoffFields = fields.seller_mobile
-          ? (fields as Record<string, string>)
-          : { ...fields, seller_mobile: "pending" } as Record<string, string>;
+      const handoffFields = fields.seller_mobile
+        ? (fields as Record<string, string>)
+        : ({ ...fields, seller_mobile: "pending" } as Record<string, string>);
 
-        try {
-          const result = await api.handoffToWhatsApp(
-            handoffFields,
-            sessionId,
-            transcript
-          );
+      api
+        .handoffToWhatsApp(handoffFields, sessionId, transcript)
+        .then(() =>
           toast.success(
             fields.seller_mobile
               ? "Details saved! Check WhatsApp for remaining questions."
-              : "Partial details saved. Please call again to complete filing."
-          );
-          router.push(`/disputes/${result.dispute_id}`);
-        } catch {
-          toast.error("Could not save details. Please try again.");
-          setPhase("idle");
-        }
-      }
+              : "Partial details saved under My Cases."
+          )
+        )
+        .catch(() => toast.error("Could not save partial details."));
     }
-  }, [fields, sessionId, mode, router]);
+
+    // Back to the start screen
+    setActive(false);
+    setMessages([]);
+    setFields({});
+    setSessionId(undefined);
+  }, [fields, sessionId, mode]);
 
   const cleanupRecording = () => {
     if (silenceTimerRef.current) {
@@ -993,8 +989,8 @@ export default function FileCasePage() {
           >
             {conversationActive ? (
               <>
-                <Square className="h-4 w-4" fill="white" />
-                Stop Conversation
+                <PhoneOff className="h-4 w-4" />
+                End Call
               </>
             ) : (
               <>
