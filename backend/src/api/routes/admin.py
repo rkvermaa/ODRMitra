@@ -216,6 +216,32 @@ async def disconnect_bot(bot_id: str, admin_id: RequireAdmin, db: DBSession):
     return {"success": True}
 
 
+@router.delete("/bots/{bot_id}")
+async def delete_bot(bot_id: str, admin_id: RequireAdmin, db: DBSession):
+    """Fully remove a bot: log the number out of WhatsApp and delete the record.
+
+    Used to re-register cleanly (fresh QR pairing rebuilds all encryption
+    sessions — the fix when devices show 'waiting for this message')."""
+    bot = await _get_bot(db, bot_id, admin_id)
+
+    try:
+        import httpx
+        from src.api.routes.channel.whatsapp.connection import get_baileys_url, get_baileys_headers
+
+        baileys_url = get_baileys_url()
+        headers = get_baileys_headers()
+        async with httpx.AsyncClient(timeout=15) as client:
+            await client.post(
+                f"{baileys_url}/sessions/{bot_id}/logout",
+                headers=headers,
+            )
+    except Exception:
+        pass  # logout is best-effort; the record goes either way
+
+    await db.delete(bot)
+    return {"success": True}
+
+
 @router.post("/bots/{bot_id}/reset")
 async def reset_bot(bot_id: str, admin_id: RequireAdmin, db: DBSession):
     """Reset a WhatsApp bot session."""

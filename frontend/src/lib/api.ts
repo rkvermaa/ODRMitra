@@ -319,6 +319,12 @@ export function adminResetBot(botId: string) {
   });
 }
 
+export function adminDeleteBot(botId: string) {
+  return request<{ success: boolean }>(`/admin/bots/${botId}`, {
+    method: "DELETE",
+  });
+}
+
 export function adminListCases() {
   return request<Dispute[]>("/admin/cases");
 }

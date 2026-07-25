@@ -94,10 +94,25 @@ export default function WhatsAppBotsPage() {
   const resetBot = async (botId: string) => {
     try {
       await api.adminResetBot(botId);
-      toast.success("Bot session reset");
+      toast.success("Session reset — scan the new QR to re-pair");
       loadBots();
+      // The fresh session generates a new QR shortly — poll and show it
+      startPolling(botId);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Reset failed");
+    }
+  };
+
+  const deleteBot = async (botId: string) => {
+    if (!window.confirm("Delete this bot? The number is logged out of WhatsApp and must be re-paired via QR to use again.")) {
+      return;
+    }
+    try {
+      await api.adminDeleteBot(botId);
+      toast.success("Bot deleted");
+      loadBots();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Delete failed");
     }
   };
 
@@ -224,14 +239,21 @@ export default function WhatsAppBotsPage() {
                       <button
                         onClick={() => resetBot(bot.id)}
                         className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                        title="Reset session"
+                        title="Reset session (re-pair with new QR)"
                       >
                         <RefreshCw className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => disconnectBot(bot.id)}
-                        className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        className="rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                         title="Disconnect"
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteBot(bot.id)}
+                        className="rounded p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        title="Delete bot (logout + remove)"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
