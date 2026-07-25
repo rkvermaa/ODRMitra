@@ -386,14 +386,17 @@ export default function FileCasePage() {
           { role: "user", content: transcript, timestamp: Date.now() },
         ]);
 
-        const langCode = await sendLID(transcript);
-
-        if (stopped()) return;
+        // Fire language detection CONCURRENTLY with the LLM turn — its
+        // result is only needed for TTS afterwards; serializing it cost
+        // ~1.8s of measured latency on every voice turn.
+        const langPromise = sendLID(transcript).catch(() => "hi-IN");
 
         const disputeId = mode === "existing-case" ? selectedDisputeId : undefined;
         const res = await api.sendMessage(transcript, sessionId, disputeId || undefined, "voice");
 
         if (stopped()) return;
+
+        const langCode = await langPromise;
 
         setSessionId(res.session_id);
 
