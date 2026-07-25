@@ -25,8 +25,10 @@ jwt_algorithm = "HS256"
 jwt_expire_minutes = 1440  # 24 hours
 
 # LLM Configuration
+# DeepSeek retired "deepseek-chat" (July 2026); the API now accepts only
+# deepseek-v4-pro / deepseek-v4-flash. Flash keeps voice latency under 2s.
 default_llm_provider = "deepseek"
-default_llm_model = "deepseek-chat"
+default_llm_model = "deepseek-v4-flash"
 
 # Embedding Model (sentence-transformers - local, free)
 embedding_model = "sentence-transformers/all-MiniLM-L6-v2"

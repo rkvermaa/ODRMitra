@@ -53,13 +53,16 @@ class PredictOutcomeTool(BaseTool):
                 case_summary = f"""
 Case Number: {dispute.case_number}
 Category: {dispute.category}
-Claimed Amount: INR {dispute.claimed_amount:,.2f} if dispute.claimed_amount else 'Not specified'
-Invoice Date: {dispute.invoice_date}
-Due Date: {dispute.due_date}
-Description: {dispute.description}
-Goods/Services: {dispute.goods_services_description}
+Claimed Amount: {f'INR {dispute.claimed_amount:,.2f}' if dispute.claimed_amount else 'Not specified'}
+Invoice Amount: {f'INR {dispute.invoice_amount:,.2f}' if dispute.invoice_amount else 'Not specified'}
+Principal Outstanding: {f'INR {dispute.principal_amount:,.2f}' if dispute.principal_amount else 'Not specified'}
+PO Date: {dispute.po_date or 'Not specified'}
+Payment Terms: {dispute.payment_terms or 'Not specified'}
+Interest Start Date: {dispute.interest_start_date or 'Not specified'}
+Description: {dispute.description or 'Not specified'}
+Goods/Services: {dispute.goods_services_description or 'Not specified'}
 Documents Uploaded: {len(docs)}
-Document Types: {', '.join(d.doc_type for d in docs)}
+Document Types: {', '.join(d.doc_type for d in docs) if docs else 'None'}
 """
 
                 # Search knowledge base for precedents
