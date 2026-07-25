@@ -34,6 +34,11 @@ default_llm_model = "deepseek-v4-flash"
 embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 embedding_dimension = 384
 
+# ODR Workflow
+# Days the respondent has to file their SOD after intimation (Section 18).
+# Statutory default 15; lower it to demo the ex-parte auto-advance live.
+sod_response_days = 15
+
 # Agent Configuration
 max_history_messages = 20
 max_history_tokens = 4000

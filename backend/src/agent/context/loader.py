@@ -88,6 +88,18 @@ async def load_user_disputes(user_id: str, db: AsyncSession) -> list[dict[str, A
             .order_by(Dispute.created_at.desc())
         )
         disputes = result.scalars().all()
+
+        # Lazy ex-parte check: a silent buyer must never stall a case. This
+        # loader owns its session, so commit the transition here.
+        import asyncio
+
+        from src.tasks.dispatcher import advance_expired_sod, dispatch_ex_parte_notice
+
+        advanced = [d for d in disputes if advance_expired_sod(d)]
+        if advanced:
+            await db.commit()
+            for d in advanced:
+                asyncio.create_task(dispatch_ex_parte_notice(str(d.id)))
     except Exception as e:
         log.error(f"Failed to load user disputes: {e}")
         return []
@@ -175,6 +187,12 @@ def build_respondent_context(disputes: list[dict[str, Any]]) -> str:
         "case details, explain their Section 18 options (respond within 15",
         "days, submit their side / Statement of Defense, or propose a",
         "settlement), and offer to record their response.",
+        "",
+        "The MOMENT they state their side (admit / partly admit / deny, and",
+        "why — e.g. defective goods, already paid), call `submit_defense` with",
+        "that case's dispute_id, the response_type, their statement, and any",
+        "admitted amount. Do not wait or re-confirm; record it, then explain",
+        "the next steps from the tool result.",
     ]
     for i, d in enumerate(disputes, 1):
         stage = STATUS_LABELS.get(d["status"], d["status"])

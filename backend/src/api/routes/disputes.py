@@ -1,4 +1,4 @@
-"""Dispute CRUD routes"""
+﻿"""Dispute CRUD routes"""
 
 import random
 from datetime import date
@@ -43,7 +43,7 @@ class DisputeCreate(BaseModel):
     cause_of_action: str | None = None
     relief_sought: str | None = None
     correspondence_summary: str | None = None
-    buyer_objections: list[dict] | None = None
+    buyer_objections: dict | None = None
     msefc_council: str | None = None
 
 
@@ -78,7 +78,7 @@ class DisputeUpdate(BaseModel):
     cause_of_action: str | None = None
     relief_sought: str | None = None
     correspondence_summary: str | None = None
-    buyer_objections: list[dict] | None = None
+    buyer_objections: dict | None = None
     msefc_council: str | None = None
 
 
@@ -119,7 +119,7 @@ class DisputeResponse(BaseModel):
     cause_of_action: str | None
     relief_sought: str | None
     correspondence_summary: str | None
-    buyer_objections: list[dict] | None
+    buyer_objections: dict | None
     msefc_council: str | None
     # AI
     ai_classification: dict | None
@@ -194,6 +194,21 @@ async def _generate_case_number(db) -> str:
     return f"ODR-2026-{count + 1:04d}"
 
 
+def _check_sod_windows(disputes) -> None:
+    """Lazy ex-parte advance on load — a silent buyer never stalls a case.
+
+    Mutations are committed by the request's session; the seller notice for
+    each advanced case dispatches in the background.
+    """
+    import asyncio
+
+    from src.tasks.dispatcher import advance_expired_sod, dispatch_ex_parte_notice
+
+    for dispute in disputes:
+        if advance_expired_sod(dispute):
+            asyncio.create_task(dispatch_ex_parte_notice(str(dispute.id)))
+
+
 @router.get("", response_model=list[DisputeResponse])
 async def list_disputes(user_id: CurrentUserId, db: DBSession):
     """List disputes for the current user (as claimant or respondent)."""
@@ -205,6 +220,7 @@ async def list_disputes(user_id: CurrentUserId, db: DBSession):
         .order_by(Dispute.created_at.desc())
     )
     disputes = result.scalars().all()
+    _check_sod_windows(disputes)
     return [_dispute_to_response(d) for d in disputes]
 
 
@@ -360,6 +376,7 @@ async def get_dispute(dispute_id: str, user_id: CurrentUserId, db: DBSession):
     if str(dispute.claimant_id) != user_id and str(dispute.respondent_id) != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
 
+    _check_sod_windows([dispute])
     return _dispute_to_response(dispute)
 
 

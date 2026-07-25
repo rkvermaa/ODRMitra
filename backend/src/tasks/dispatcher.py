@@ -220,6 +220,95 @@ async def dispatch_case_processing(dispute_id: str, user_id: str):
         log.error(f"dispatch_case_processing failed for dispute {dispute_id}: {e}")
 
 
+def advance_expired_sod(dispute) -> bool:
+    """Ex-parte advance: if the SOD response window expired with no defense,
+    move the case to Pre-MSEFC so a silent buyer never stalls the flow.
+
+    Mutates the dispute (caller's session commits) and returns True when the
+    transition happened — the caller then dispatches the seller notification.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from src.db.models.dispute import DisputeStatus
+
+    if dispute.status != DisputeStatus.INTIMATION_SENT.value:
+        return False
+    if not dispute.intimation_sent_at or dispute.buyer_objections:
+        return False
+
+    window_days = int(settings.get("sod_response_days", 15))
+    deadline = dispute.intimation_sent_at + timedelta(days=window_days)
+    now = datetime.now(timezone.utc)
+    if now <= deadline:
+        return False
+
+    dispute.status = DisputeStatus.PRE_MSEFC.value
+    dispute.buyer_objections = {
+        "sod_filed": False,
+        "ex_parte": True,
+        "window_expired_at": deadline.isoformat(),
+    }
+    log.info(
+        f"SOD window expired for {dispute.case_number} — advancing ex-parte to pre_msefc"
+    )
+    return True
+
+
+async def dispatch_ex_parte_notice(dispute_id: str) -> None:
+    """Tell the seller the buyer stayed silent and the case moved forward."""
+    try:
+        import uuid
+
+        import httpx
+        from sqlalchemy import select
+
+        from src.db.session import async_session_factory
+        from src.db.models.dispute import Dispute
+        from src.db.models.user import User
+
+        async with async_session_factory() as db:
+            dispute = (
+                await db.execute(
+                    select(Dispute).where(Dispute.id == uuid.UUID(dispute_id))
+                )
+            ).scalar_one_or_none()
+            if not dispute:
+                return
+            claimant = (
+                await db.execute(
+                    select(User).where(User.id == dispute.claimant_id)
+                )
+            ).scalar_one_or_none()
+
+        if not claimant or not claimant.mobile_number:
+            return
+        session_id = await _get_baileys_session_id()
+        if not session_id:
+            return
+
+        window_days = int(settings.get("sod_response_days", 15))
+        message = (
+            f"⚖️ *Update — {dispute.case_number}*\n\n"
+            f"Buyer ne {window_days} din ke andar apna jawab (SOD) file nahi kiya.\n\n"
+            f"Aapka case ab *ex-parte* aage badh gaya hai — mutual settlement "
+            f"stage (Pre-MSEFC). Aap AI outcome prediction dekh sakte hain ya "
+            f"MSEFC reference ke liye aage badh sakte hain. Buyer ka jawab na "
+            f"dena aapke paksh ko mazboot karta hai."
+        )
+        baileys_url = settings.get("baileys_service_url", "http://127.0.0.1:3001")
+        api_key = settings.get("baileys_api_key", "baileys-secret-key")
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                f"{baileys_url}/sessions/{session_id}/send",
+                json={"to": _normalize_mobile(claimant.mobile_number), "message": message},
+                headers={"X-API-Key": api_key, "Content-Type": "application/json"},
+                timeout=30.0,
+            )
+        log.info(f"Ex-parte notice sent to seller for {dispute.case_number}")
+    except Exception as e:
+        log.error(f"dispatch_ex_parte_notice failed: {e}")
+
+
 def _build_buyer_intimation(dispute, claimant) -> str:
     """Section 18 intimation notice sent to the buyer on WhatsApp.
 
