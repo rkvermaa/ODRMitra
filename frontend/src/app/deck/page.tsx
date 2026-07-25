@@ -250,6 +250,40 @@ function DemoMapSlide() {
   );
 }
 
+function DemoHighlightsSlide() {
+  const moments = [
+    [Mic, "A natural voice conversation", "The assistant asks in Hindi/Hinglish, listens, and responds — like talking to a helpful clerk"],
+    [Layers, "The form fills itself", "Watch case fields populate on screen in real time as the seller speaks"],
+    [MessageSquare, "Phones buzz across the room", "Intimation and follow-ups land on real WhatsApp numbers, live"],
+    [TrendingUp, "The timeline moves on its own", "Filing → Intimation → Defense — the 16-step tracker advances as it happens"],
+    [FileSearch, "AI reads the case like a lawyer", "Outcome prediction with statutory grounding and a suggested settlement range"],
+    [FileSignature, "A settlement, drafted", "Section 16 interest computed and written into a ready agreement"],
+  ];
+  return (
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>Demo Highlights</Kicker>
+      <SlideTitle>Six moments to watch for</SlideTitle>
+
+      <div className="mt-10 grid grid-cols-3 gap-5">
+        {moments.map(([Icon, title, desc]) => {
+          const I = Icon as React.ComponentType<{ className?: string }>;
+          return (
+            <GlowBox key={title as string}>
+              <I className="h-7 w-7 text-[#d9b36a]" />
+              <p className="mt-3 text-lg font-semibold leading-snug text-white">
+                {title as string}
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#a3aec3]">
+                {desc as string}
+              </p>
+            </GlowBox>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function TechTag({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-full border border-[#93a5c4]/20 bg-[#0b1120]/70 px-2 py-0.5 font-mono text-[10.5px] text-[#76839f]">
@@ -701,6 +735,7 @@ const SLIDES: React.ComponentType[] = [
   ProblemSlide,
   SolutionSlide,
   DemoMapSlide,
+  DemoHighlightsSlide,
   ArchitectureSlide,
   PipelineSlide,
   JourneySlide,
