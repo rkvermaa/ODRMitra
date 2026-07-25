@@ -45,6 +45,12 @@ const FIELD_LABELS: Record<string, string> = {
 
 const FIELD_ORDER = Object.keys(FIELD_LABELS);
 
+// Tiny silent WAV — played inside the Start click to unlock the audio
+// element before the (slow) TTS round-trip, or Chrome's autoplay policy
+// rejects play() once the ~5s user-activation window expires.
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
 // ─── VAD Constants ───
 const SPEAKING_THRESHOLD = 0.03;
 const SILENCE_DURATION = 1500;
@@ -735,6 +741,22 @@ export default function FileCasePage() {
   // whenever internal state had already flipped inactive.
 
   const startSession = async () => {
+    // Unlock audio playback within this user gesture — the deployed TTS
+    // round-trip can outlive Chrome's transient-activation window, after
+    // which play() is rejected and the greeting never speaks.
+    const audio = responseAudioRef.current;
+    if (audio) {
+      audio.muted = true;
+      audio.src = SILENT_WAV;
+      audio
+        .play()
+        .catch(() => {})
+        .finally(() => {
+          audio.pause();
+          audio.muted = false;
+        });
+    }
+
     setActive(true);
     conversationActiveRef.current = true;
     setConversationActive(true);
