@@ -43,7 +43,7 @@ const LIVE_URL = "odrmitra.147-182-186-207.sslip.io";
 
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-sm font-semibold uppercase tracking-[0.25em] text-saffron-400">
+    <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#d9b36a]">
       {children}
     </p>
   );
@@ -75,7 +75,7 @@ function GlowBox({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-navy-400/25 bg-navy-500/15 p-5 backdrop-blur ${className}`}
+      className={`rounded-2xl border border-[#93a5c4]/15 bg-[#1c2740]/40 p-5 backdrop-blur ${className}`}
     >
       {children}
     </div>
@@ -87,32 +87,32 @@ function GlowBox({
 function TitleSlide() {
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      <div className="flex items-center gap-3 rounded-full border border-navy-400/30 bg-navy-500/20 px-5 py-2 text-sm text-navy-100">
-        <Landmark className="h-4 w-4 text-saffron-400" />
+      <div className="flex items-center gap-3 rounded-full border border-[#93a5c4]/25 bg-[#1c2740]/40 px-5 py-2 text-sm text-[#cbd4e2]">
+        <Landmark className="h-4 w-4 text-[#d9b36a]" />
         IndiaAI Innovation Challenge 2026 · Problem Statement 1 · Ministry of MSME
       </div>
 
       <div className="mt-10 flex items-center gap-5">
-        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-saffron-400 to-saffron-600 shadow-2xl shadow-saffron-500/40">
+        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#dcb877] to-[#a87f3d] shadow-2xl shadow-[#c9a45c]/40">
           <Scale className="h-12 w-12 text-white" />
         </div>
         <div className="text-left">
           <h1 className="text-[84px] font-bold leading-none tracking-tight text-white">
             ODRMitra
           </h1>
-          <p className="mt-1 text-2xl text-navy-200">ओडीआर मित्र</p>
+          <p className="mt-1 text-2xl text-[#a3aec3]">ओडीआर मित्र</p>
         </div>
       </div>
 
-      <p className="mt-8 max-w-3xl text-2xl leading-relaxed text-navy-100">
+      <p className="mt-8 max-w-3xl text-2xl leading-relaxed text-[#cbd4e2]">
         AI-enabled virtual negotiation assistant for resolving MSME
-        delayed-payment disputes — <span className="text-saffron-300">by voice,
+        delayed-payment disputes — <span className="text-[#e8cd9a]">by voice,
         WhatsApp, and web</span>
       </p>
 
       <div className="mt-10 flex items-center gap-4">
         <LivePill label="WORKING PoC · LIVE" />
-        <span className="font-mono text-lg text-saffron-300">{LIVE_URL}</span>
+        <span className="font-mono text-lg text-[#e8cd9a]">{LIVE_URL}</span>
       </div>
     </div>
   );
@@ -133,17 +133,17 @@ function ProblemSlide() {
           const I = Icon as React.ComponentType<{ className?: string }>;
           return (
             <GlowBox key={l as string} className="text-center">
-              <I className="mx-auto h-8 w-8 text-saffron-400" />
+              <I className="mx-auto h-8 w-8 text-[#d9b36a]" />
               <p className="mt-4 text-[52px] font-bold leading-none text-white">
                 {v as string}
               </p>
-              <p className="mt-3 text-lg text-navy-200">{l as string}</p>
+              <p className="mt-3 text-lg text-[#a3aec3]">{l as string}</p>
             </GlowBox>
           );
         })}
       </div>
 
-      <p className="mt-12 text-xl leading-relaxed text-navy-100">
+      <p className="mt-12 text-xl leading-relaxed text-[#cbd4e2]">
         The MSMED Act 2006 gives sellers strong rights — 45-day payment deadline,
         3× bank-rate compound interest — but{" "}
         <span className="font-semibold text-white">
@@ -161,7 +161,7 @@ function SolutionSlide() {
       <Kicker>The Solution</Kicker>
       <SlideTitle>
         File a dispute by{" "}
-        <span className="bg-gradient-to-r from-saffron-300 to-saffron-500 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-[#eedbaa] to-[#c9a45c] bg-clip-text text-transparent">
           just speaking
         </span>
       </SlideTitle>
@@ -175,13 +175,13 @@ function SolutionSlide() {
           const I = Icon as React.ComponentType<{ className?: string }>;
           return (
             <GlowBox key={title as string}>
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-saffron-400 to-saffron-600 shadow-lg shadow-saffron-500/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#dcb877] to-[#a87f3d] shadow-lg shadow-[#c9a45c]/30">
                 <I className="h-6 w-6 text-white" />
               </div>
               <p className="mt-4 text-xl font-semibold text-white">
                 {title as string}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-navy-200">
+              <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
                 {desc as string}
               </p>
             </GlowBox>
@@ -189,7 +189,7 @@ function SolutionSlide() {
         })}
       </div>
 
-      <div className="mt-10 flex items-center gap-3 text-lg text-navy-100">
+      <div className="mt-10 flex items-center gap-3 text-lg text-[#cbd4e2]">
         <CheckCircle2 className="h-5 w-5 text-green-400" />
         Three channels, one AI brain — every action aligned with the MSMED Act 2006
         <LivePill label="WORKING IN THE PoC" />
@@ -217,32 +217,32 @@ function DemoMapSlide() {
             <div key={title as string} className="relative">
               <GlowBox className="h-full">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-saffron-500 text-sm font-bold text-white">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#c9a45c] text-sm font-bold text-white">
                     {i + 1}
                   </span>
-                  <I className="h-6 w-6 text-saffron-300" />
+                  <I className="h-6 w-6 text-[#e8cd9a]" />
                 </div>
                 <p className="mt-3 text-lg font-semibold leading-snug text-white">
                   {title as string}
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-navy-200">
+                <p className="mt-2 text-sm leading-relaxed text-[#a3aec3]">
                   {desc as string}
                 </p>
               </GlowBox>
               {i < 3 && (
-                <ArrowRight className="absolute -right-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-saffron-400" />
+                <ArrowRight className="absolute -right-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#d9b36a]" />
               )}
             </div>
           );
         })}
       </div>
 
-      <div className="mt-10 flex items-center justify-center gap-8 text-navy-100">
+      <div className="mt-10 flex items-center justify-center gap-8 text-[#cbd4e2]">
         <span className="text-lg">
           Cast — <span className="font-semibold text-white">Ravi</span>: seller ·{" "}
           <span className="font-semibold text-white">Gaurav</span>: buyer ·{" "}
           <span className="font-semibold text-white">Assistant</span>:{" "}
-          <span className="font-mono text-saffron-300">+91 70173 81728</span>
+          <span className="font-mono text-[#e8cd9a]">+91 70173 81728</span>
         </span>
         <LivePill label="LIVE ON REAL PHONES" />
       </div>
@@ -252,7 +252,7 @@ function DemoMapSlide() {
 
 function TechTag({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-navy-400/30 bg-navy-800/60 px-2 py-0.5 font-mono text-[10.5px] text-navy-300">
+    <span className="rounded-full border border-[#93a5c4]/20 bg-[#0b1120]/70 px-2 py-0.5 font-mono text-[10.5px] text-[#76839f]">
       {children}
     </span>
   );
@@ -267,13 +267,13 @@ function ArchitectureSlide() {
       <div className="mt-10 grid grid-cols-[1fr_auto_1.3fr_auto_1fr] items-stretch gap-4">
         {/* Users reach it */}
         <GlowBox>
-          <p className="text-sm font-semibold uppercase tracking-wider text-navy-300">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#76839f]">
             How sellers reach it
           </p>
           <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><Mic className="h-5 w-5 text-saffron-400" /> A phone conversation</p>
-            <p className="flex items-center gap-2.5"><MessageSquare className="h-5 w-5 text-saffron-400" /> A WhatsApp message</p>
-            <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-saffron-400" /> A simple website</p>
+            <p className="flex items-center gap-2.5"><Mic className="h-5 w-5 text-[#d9b36a]" /> A phone conversation</p>
+            <p className="flex items-center gap-2.5"><MessageSquare className="h-5 w-5 text-[#d9b36a]" /> A WhatsApp message</p>
+            <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-[#d9b36a]" /> A simple website</p>
           </div>
           <div className="mt-4 flex flex-wrap gap-1.5">
             <TechTag>Sarvam AI voice</TechTag>
@@ -281,14 +281,14 @@ function ArchitectureSlide() {
           </div>
         </GlowBox>
 
-        <ArrowRight className="h-6 w-6 self-center text-saffron-400" />
+        <ArrowRight className="h-6 w-6 self-center text-[#d9b36a]" />
 
         {/* The brain */}
-        <GlowBox className="border-saffron-500/30 bg-saffron-500/10">
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-saffron-300">
+        <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[#e8cd9a]">
             <Bot className="h-4 w-4" /> The AI Assistant
           </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-navy-100">
+          <p className="mt-2 text-[15px] leading-relaxed text-[#cbd4e2]">
             One assistant understands the conversation and acts only through{" "}
             <span className="font-semibold text-white">
               12 approved legal actions
@@ -296,7 +296,7 @@ function ArchitectureSlide() {
             — file the case, notify the buyer, record the defense, predict the
             outcome, calculate interest, draft the settlement.
           </p>
-          <p className="mt-2 text-[15px] text-navy-100">
+          <p className="mt-2 text-[15px] text-[#cbd4e2]">
             The underlying AI model is{" "}
             <span className="font-semibold text-white">swappable</span> — the
             government can choose any model, Indian or open-source.
@@ -308,17 +308,17 @@ function ArchitectureSlide() {
           </div>
         </GlowBox>
 
-        <ArrowRight className="h-6 w-6 self-center text-saffron-400" />
+        <ArrowRight className="h-6 w-6 self-center text-[#d9b36a]" />
 
         {/* Knowledge */}
         <GlowBox>
-          <p className="text-sm font-semibold uppercase tracking-wider text-navy-300">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#76839f]">
             What it thinks with
           </p>
           <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><BookOpen className="h-5 w-5 text-saffron-400" /> An indexed law library</p>
-            <p className="flex items-center gap-2.5"><Database className="h-5 w-5 text-saffron-400" /> Secure case records</p>
-            <p className="flex items-center gap-2.5"><ShieldCheck className="h-5 w-5 text-saffron-400" /> Answers quote the Act</p>
+            <p className="flex items-center gap-2.5"><BookOpen className="h-5 w-5 text-[#d9b36a]" /> An indexed law library</p>
+            <p className="flex items-center gap-2.5"><Database className="h-5 w-5 text-[#d9b36a]" /> Secure case records</p>
+            <p className="flex items-center gap-2.5"><ShieldCheck className="h-5 w-5 text-[#d9b36a]" /> Answers quote the Act</p>
           </div>
           <div className="mt-4 flex flex-wrap gap-1.5">
             <TechTag>PostgreSQL</TechTag>
@@ -327,10 +327,59 @@ function ArchitectureSlide() {
         </GlowBox>
       </div>
 
-      <p className="mt-10 text-center text-lg text-navy-200">
+      <p className="mt-10 text-center text-lg text-[#a3aec3]">
         The law library holds the MSMED Act 2006, MSEFC rules, the Mediation
         Act, and Supreme Court judgments — the assistant quotes the law, it
         never invents it
+      </p>
+    </div>
+  );
+}
+
+function PipelineSlide() {
+  const stages = [
+    [Mic, "Voice collects the basics", "A short conversation — buyer, amount, what was supplied. No form ever appears."],
+    [Zap, "Every answer saved instantly", "Call drops? Battery dies? Nothing is lost — the case holds everything said so far."],
+    [Phone, "Case files, buyer notified", "The claim is registered and the buyer's Section 18 notice goes out on WhatsApp within seconds."],
+    [MessageSquare, "The case lives on WhatsApp", "Remaining details, documents, status updates, the buyer's defense, negotiation — one familiar chat thread."],
+  ];
+  return (
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>The Signature Pipeline</Kicker>
+      <SlideTitle>From a voice call to a living WhatsApp case</SlideTitle>
+
+      <div className="mt-10 grid grid-cols-4 gap-4">
+        {stages.map(([Icon, title, desc], i) => {
+          const I = Icon as React.ComponentType<{ className?: string }>;
+          return (
+            <div key={title as string} className="relative">
+              <GlowBox className="h-full">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#31405f] text-sm font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <I className="h-6 w-6 text-[#e8cd9a]" />
+                </div>
+                <p className="mt-3 text-lg font-semibold leading-snug text-white">
+                  {title as string}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-[#a3aec3]">
+                  {desc as string}
+                </p>
+              </GlowBox>
+              {i < 3 && (
+                <ArrowRight className="absolute -right-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-[#d9b36a]" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="mt-10 text-center text-xl text-[#cbd4e2]">
+        One case, one thread —{" "}
+        <span className="font-semibold text-white">
+          the seller never repeats themselves and never fills a form
+        </span>
       </p>
     </div>
   );
@@ -345,9 +394,9 @@ function JourneySlide() {
       <div className="mt-10 grid grid-cols-2 gap-6">
         <GlowBox>
           <p className="flex items-center gap-2 text-lg font-semibold text-white">
-            <Zap className="h-5 w-5 text-saffron-400" /> Steps 1–7 · AI-active
+            <Zap className="h-5 w-5 text-[#d9b36a]" /> Steps 1–7 · AI-active
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[15px] text-navy-100">
+          <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-[15px] text-[#cbd4e2]">
             {[
               "Registration (Udyam)",
               "Statement of Claim",
@@ -366,21 +415,21 @@ function JourneySlide() {
         </GlowBox>
 
         <div className="space-y-4">
-          <GlowBox className="border-saffron-500/30 bg-saffron-500/10">
+          <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
             <p className="text-lg font-semibold text-white">
               💬 SOD filed inside WhatsApp chat
             </p>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-navy-100">
+            <p className="mt-1.5 text-[15px] leading-relaxed text-[#cbd4e2]">
               The buyer states their side in plain language — the agent records
               a structured defense (admit / partial / deny + amount) and
               notifies the seller. No forms, no login.
             </p>
           </GlowBox>
-          <GlowBox className="border-saffron-500/30 bg-saffron-500/10">
+          <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
             <p className="text-lg font-semibold text-white">
               ⏱️ Ex-parte auto-advance
             </p>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-navy-100">
+            <p className="mt-1.5 text-[15px] leading-relaxed text-[#cbd4e2]">
               Buyer silent past the statutory window? The case advances
               automatically with an ex-parte record —{" "}
               <span className="font-semibold text-white">
@@ -391,11 +440,11 @@ function JourneySlide() {
         </div>
       </div>
 
-      <p className="mt-6 text-center text-lg text-navy-200">
+      <p className="mt-6 text-center text-lg text-[#a3aec3]">
         Steps 8–16 (MSEFC, conciliation, arbitration) tracked on the dashboard —
         humans decide, the platform keeps everyone informed
       </p>
-      <p className="mt-3 text-center text-[15px] text-navy-300">
+      <p className="mt-3 text-center text-[15px] text-[#76839f]">
         PoC scope: exact document requirements, MSEFC formats, and state-level
         variations will be refined with the Ministry in Stage 1 — the
         architecture absorbs them without redesign
@@ -424,13 +473,13 @@ function CapabilitiesSlide() {
           return (
             <GlowBox key={title as string}>
               <div className="flex items-start justify-between">
-                <I className="h-7 w-7 text-saffron-400" />
+                <I className="h-7 w-7 text-[#d9b36a]" />
                 <LivePill />
               </div>
               <p className="mt-3 text-lg font-semibold text-white">
                 {title as string}
               </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-navy-200">
+              <p className="mt-1.5 text-sm leading-relaxed text-[#a3aec3]">
                 {desc as string}
               </p>
             </GlowBox>
@@ -438,7 +487,7 @@ function CapabilitiesSlide() {
         })}
       </div>
 
-      <p className="mt-8 text-center text-[15px] text-navy-300">
+      <p className="mt-8 text-center text-[15px] text-[#76839f]">
         Each is a working first implementation — Stage 1 validates and hardens
         them against real SAMADHAAN case data with the Ministry
       </p>
@@ -464,9 +513,9 @@ function ComplianceSlide() {
           return (
             <GlowBox key={title as string}>
               <p className="flex items-center gap-2.5 text-lg font-semibold text-white">
-                <I className="h-5 w-5 shrink-0 text-saffron-400" /> {title as string}
+                <I className="h-5 w-5 shrink-0 text-[#d9b36a]" /> {title as string}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-navy-200">
+              <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
                 {desc as string}
               </p>
             </GlowBox>
@@ -474,7 +523,7 @@ function ComplianceSlide() {
         })}
       </div>
 
-      <p className="mt-8 text-center text-[15px] text-navy-300">
+      <p className="mt-8 text-center text-[15px] text-[#76839f]">
         Stage 2 hardening: row-level security for per-tenant isolation · PII
         minimization · security audit per IndiaAI requirements
       </p>
@@ -496,8 +545,8 @@ function MetricsSlide() {
           ["< ₹2k/mo", "entire platform footprint — runs in 1.5GB RAM"],
         ].map(([v, l]) => (
           <GlowBox key={l} className="text-center">
-            <p className="text-[44px] font-bold leading-none text-saffron-300">{v}</p>
-            <p className="mt-3 text-sm leading-relaxed text-navy-200">{l}</p>
+            <p className="text-[44px] font-bold leading-none text-[#e8cd9a]">{v}</p>
+            <p className="mt-3 text-sm leading-relaxed text-[#a3aec3]">{l}</p>
           </GlowBox>
         ))}
       </div>
@@ -507,7 +556,7 @@ function MetricsSlide() {
           <p className="text-lg font-semibold text-white">
             Proven this week, in production
           </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-navy-200">
+          <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
             Real two-party dispute filed by voice, intimation delivered to a real
             buyer&apos;s phone, defense recorded from WhatsApp, timeline advanced —
             end to end on the deployed system.
@@ -517,7 +566,7 @@ function MetricsSlide() {
           <p className="text-lg font-semibold text-white">
             Accuracy benchmarking — Stage 1 plan
           </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-navy-200">
+          <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
             Extraction & classification accuracy will be validated against
             AIKosh MSME-SAMADHAAN datasets with published methodology — we
             present measured numbers, not estimates.
@@ -546,9 +595,9 @@ function ResilienceSlide() {
           return (
             <GlowBox key={title as string}>
               <p className="flex items-center gap-2.5 text-lg font-semibold text-white">
-                <I className="h-5 w-5 shrink-0 text-saffron-400" /> {title as string}
+                <I className="h-5 w-5 shrink-0 text-[#d9b36a]" /> {title as string}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-navy-200">
+              <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
                 {desc as string}
               </p>
             </GlowBox>
@@ -570,18 +619,18 @@ function RoadmapSlide() {
           <p className="text-sm font-bold uppercase tracking-wider text-green-400">
             Today — Live PoC
           </p>
-          <ul className="mt-3 space-y-2 text-[15px] text-navy-100">
+          <ul className="mt-3 space-y-2 text-[15px] text-[#cbd4e2]">
             <li>✓ Voice + WhatsApp + web filing</li>
             <li>✓ Intimation, SOD, ex-parte flow</li>
             <li>✓ DGP prediction & settlement drafts</li>
             <li>✓ Deployed & publicly reachable</li>
           </ul>
         </GlowBox>
-        <GlowBox className="border-saffron-500/30">
-          <p className="text-sm font-bold uppercase tracking-wider text-saffron-400">
+        <GlowBox className="border-[#c9a45c]/40">
+          <p className="text-sm font-bold uppercase tracking-wider text-[#d9b36a]">
             Stage 1 — Pilot
           </p>
-          <ul className="mt-3 space-y-2 text-[15px] text-navy-100">
+          <ul className="mt-3 space-y-2 text-[15px] text-[#cbd4e2]">
             <li>· Validate on AIKosh SAMADHAAN data</li>
             <li>· Toll-free calling (Twilio)</li>
             <li>· 10+ Indian languages via Sarvam</li>
@@ -592,7 +641,7 @@ function RoadmapSlide() {
           <p className="text-sm font-bold uppercase tracking-wider text-blue-400">
             Stage 2 — Scale
           </p>
-          <ul className="mt-3 space-y-2 text-[15px] text-navy-100">
+          <ul className="mt-3 space-y-2 text-[15px] text-[#cbd4e2]">
             <li>· Integration with MSME ODR portal</li>
             <li>· Security audit + RLS hardening</li>
             <li>· Streaming voice (~4s turns)</li>
@@ -601,7 +650,7 @@ function RoadmapSlide() {
         </GlowBox>
       </div>
 
-      <p className="mt-10 text-center text-lg text-navy-100">
+      <p className="mt-10 text-center text-lg text-[#cbd4e2]">
         Current footprint <span className="font-semibold text-white">&lt; ₹2,000/month</span> —
         API-based AI means cost scales <span className="font-semibold text-white">with usage,
         not with idle capacity</span>
@@ -624,11 +673,11 @@ function TeamSlide() {
       <div className="mt-10 grid grid-cols-3 gap-5">
         {team.map(([role, desc]) => (
           <GlowBox key={role}>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-saffron-400 to-saffron-600">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#dcb877] to-[#a87f3d]">
               <Users className="h-5 w-5 text-white" />
             </div>
             <p className="mt-4 text-lg font-semibold leading-snug text-white">{role}</p>
-            <p className="mt-2 text-[15px] leading-relaxed text-navy-200">{desc}</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">{desc}</p>
           </GlowBox>
         ))}
       </div>
@@ -636,11 +685,11 @@ function TeamSlide() {
       <div className="mt-12 text-center">
         <p className="mx-auto max-w-3xl text-[26px] font-medium leading-relaxed text-white">
           “Every MSME seller in India should be able to file a payment dispute
-          by <span className="text-saffron-300">simply making a phone call</span>.”
+          by <span className="text-[#e8cd9a]">simply making a phone call</span>.”
         </p>
         <div className="mt-8 flex items-center justify-center gap-4">
           <LivePill label="TRY IT NOW" />
-          <span className="font-mono text-xl text-saffron-300">https://{LIVE_URL}</span>
+          <span className="font-mono text-xl text-[#e8cd9a]">https://{LIVE_URL}</span>
         </div>
       </div>
     </div>
@@ -653,6 +702,7 @@ const SLIDES: React.ComponentType[] = [
   SolutionSlide,
   DemoMapSlide,
   ArchitectureSlide,
+  PipelineSlide,
   JourneySlide,
   CapabilitiesSlide,
   ComplianceSlide,
@@ -697,7 +747,7 @@ export default function DeckPage() {
   }, [next, prev]);
 
   return (
-    <div className="deck-viewport fixed inset-0 flex items-center justify-center overflow-hidden bg-navy-900">
+    <div className="deck-viewport fixed inset-0 flex items-center justify-center overflow-hidden bg-[#04070d]">
       {/* Edge click zones (screen only) */}
       <button
         aria-label="Previous slide"
@@ -718,7 +768,7 @@ export default function DeckPage() {
         {SLIDES.map((Slide, i) => (
           <section
             key={i}
-            className={`slide absolute inset-0 overflow-hidden bg-gradient-to-br from-navy-600 via-navy-700 to-navy-900 px-20 py-14 transition-all duration-500 ${
+            className={`slide absolute inset-0 overflow-hidden bg-gradient-to-br from-[#141c2e] via-[#0d1424] to-[#070b15] px-20 py-14 transition-all duration-500 ${
               i === idx
                 ? "z-10 translate-x-0 opacity-100"
                 : i < idx
@@ -729,17 +779,17 @@ export default function DeckPage() {
             {/* ambient glow */}
             <div
               className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full opacity-15"
-              style={{ background: "radial-gradient(circle, #f97316, transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, #c9a45c, transparent 70%)" }}
             />
             <div className="relative h-full">
               <Slide />
             </div>
             {/* footer brand */}
-            <div className="absolute bottom-6 left-20 flex items-center gap-2 text-xs text-navy-400">
-              <Scale className="h-3.5 w-3.5 text-saffron-500/70" />
+            <div className="absolute bottom-6 left-20 flex items-center gap-2 text-xs text-[#535f78]">
+              <Scale className="h-3.5 w-3.5 text-[#c9a45c]/70" />
               ODRMitra · IndiaAI Innovation Challenge 2026
             </div>
-            <div className="absolute bottom-6 right-20 text-xs text-navy-400">
+            <div className="absolute bottom-6 right-20 text-xs text-[#535f78]">
               {i + 1} / {SLIDES.length}
             </div>
           </section>
@@ -747,14 +797,14 @@ export default function DeckPage() {
       </div>
 
       {/* Controls */}
-      <div className="nav-ui absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full border border-navy-500/40 bg-navy-800/80 px-4 py-2 backdrop-blur">
-        <button onClick={prev} className="text-navy-200 transition-colors hover:text-white">
+      <div className="nav-ui absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full border border-[#93a5c4]/20 bg-[#0b1120]/80 px-4 py-2 backdrop-blur">
+        <button onClick={prev} className="text-[#a3aec3] transition-colors hover:text-white">
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <span className="min-w-[3.5rem] text-center text-sm font-medium text-navy-100">
+        <span className="min-w-[3.5rem] text-center text-sm font-medium text-[#cbd4e2]">
           {idx + 1} / {SLIDES.length}
         </span>
-        <button onClick={next} className="text-navy-200 transition-colors hover:text-white">
+        <button onClick={next} className="text-[#a3aec3] transition-colors hover:text-white">
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
