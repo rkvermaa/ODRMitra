@@ -8,7 +8,6 @@ Used for WhatsApp (text-based, latency ~5-10s is acceptable).
 import json
 from typing import Any
 
-from src.config import settings
 from src.core.logging import log
 from src.llm import get_llm_client
 from src.tools.registry import ToolRegistry
@@ -136,19 +135,31 @@ class ReactAgent:
 
         return "\n".join(parts)
 
-    async def _load_dispute_block(self) -> str:
-        """Load full case details for the prompt — same block the voice agent gets."""
-        if not self.dispute_id:
-            return ""
+    async def _load_context_blocks(self) -> str:
+        """Load seller profile + case details for the prompt — same blocks the
+        voice agent gets, so the agent never asks for facts already on file
+        (e.g. the WhatsApp sender's own mobile number)."""
         try:
-            from src.agent.context.loader import load_dispute_context, build_dispute_context
+            from src.agent.context.loader import (
+                build_dispute_context,
+                build_seller_context,
+                load_dispute_context,
+                load_seller_profile,
+            )
             from src.db.session import async_session_factory
 
             async with async_session_factory() as db:
-                info = await load_dispute_context(self.dispute_id, self.user_id, db)
-            return build_dispute_context(info)
+                profile = await load_seller_profile(self.user_id, db)
+                dispute_info = (
+                    await load_dispute_context(self.dispute_id, self.user_id, db)
+                    if self.dispute_id
+                    else {}
+                )
+
+            blocks = [build_seller_context(profile), build_dispute_context(dispute_info)]
+            return "\n\n".join(b for b in blocks if b)
         except Exception as e:
-            log.warning(f"Failed to load dispute context for prompt: {e}")
+            log.warning(f"Failed to load context blocks for prompt: {e}")
             return ""
 
     def _build_system_prompt(
@@ -156,7 +167,7 @@ class ReactAgent:
         skill: dict[str, Any],
         rag_context: str,
         history: list[dict[str, Any]] | None = None,
-        dispute_block: str = "",
+        context_blocks: str = "",
     ) -> str:
         """Build system prompt from base + skill + channel prompts + context."""
         from datetime import date
@@ -170,11 +181,10 @@ class ReactAgent:
         ]
 
         if self.dispute_id:
-            # Keep the raw ID (tools take it as an argument) plus the loaded
-            # case details so the agent never asks for facts already on file.
+            # Raw ID stays — tools take it as an argument.
             parts.append(f"\n## Active Dispute\nDispute ID: {self.dispute_id}")
-            if dispute_block:
-                parts.append(dispute_block)
+        if context_blocks:
+            parts.append(context_blocks)
 
         if rag_context:
             parts.append(f"\n## Reference Context\n{rag_context}")
@@ -267,9 +277,9 @@ class ReactAgent:
             # 3. Load RAG context
             rag_context = self._load_rag_context(user_message)
 
-            # 4. Build system prompt (with case details when a dispute is active)
-            dispute_block = await self._load_dispute_block()
-            system_prompt = self._build_system_prompt(skill, rag_context, history, dispute_block)
+            # 4. Build system prompt (with seller profile + case details)
+            context_blocks = await self._load_context_blocks()
+            system_prompt = self._build_system_prompt(skill, rag_context, history, context_blocks)
 
             # 5. Prepare messages
             messages: list[dict[str, Any]] = [
