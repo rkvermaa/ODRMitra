@@ -225,6 +225,73 @@ async def update_bot_status(baileys_session_id: str, connected: bool, phone_numb
         log.error(f"Failed to update bot status: {e}")
 
 
+def _extract_fields_blocks(texts: list[str]) -> dict:
+    """Merge all [FIELDS] JSON blocks found in the given texts (later wins)."""
+    fields: dict = {}
+    for text in texts:
+        for match in re.findall(r'\[FIELDS\]([\s\S]*?)\[/FIELDS\]', text or ""):
+            try:
+                parsed = json.loads(match)
+                fields.update({k: v for k, v in parsed.items() if v})
+            except json.JSONDecodeError:
+                pass
+    return fields
+
+
+async def _create_dispute_from_wa_conversation(
+    db,
+    user_id: str,
+    history: list[dict],
+    response_text: str,
+):
+    """Create a new dispute from fields collected across a WhatsApp filing chat."""
+    from src.api.routes.disputes import _generate_case_number
+
+    texts = [m.get("content", "") for m in (history or []) if m.get("role") == "assistant"]
+    texts.append(response_text)
+    fields = _extract_fields_blocks(texts)
+
+    if not fields:
+        log.warning("FILING_COMPLETE on WhatsApp but no [FIELDS] collected — no dispute created")
+        return None
+
+    person = fields.get("respondent_name", "")
+    company = fields.get("respondent_company", "")
+    respondent_name = f"{person} ({company})" if person and company else (person or company or None)
+
+    dispute = Dispute(
+        claimant_id=user_id,
+        case_number=await _generate_case_number(db),
+        title=fields.get("title") or "MSME Payment Dispute",
+        category="delayed_payment",
+        respondent_name=respondent_name,
+        respondent_mobile=fields.get("respondent_mobile"),
+        respondent_email=fields.get("respondent_email"),
+        respondent_gstin=fields.get("respondent_gstin"),
+        respondent_state=fields.get("respondent_state"),
+        goods_services_description=fields.get("goods_services_description"),
+        po_number=fields.get("po_number"),
+        cause_of_action=fields.get("cause_of_action"),
+        status=DisputeStatus.FILED.value,
+    )
+
+    amount_raw = fields.get("invoice_amount")
+    if amount_raw:
+        try:
+            amount = float(re.sub(r"[^\d.]", "", str(amount_raw)))
+            dispute.invoice_amount = amount
+            dispute.claimed_amount = amount
+        except (ValueError, TypeError):
+            pass
+
+    db.add(dispute)
+    await db.flush()
+    await db.refresh(dispute)
+    await db.commit()
+    log.info(f"Created dispute {dispute.case_number} from WhatsApp filing (user {user_id})")
+    return dispute
+
+
 async def send_whatsapp_response(baileys_session_id: str, to_number: str, message: str) -> bool:
     """Send a WhatsApp message via Baileys service."""
     try:
@@ -344,19 +411,32 @@ async def process_whatsapp_message(
 
             await db.commit()
 
-            # Check if collection is complete — trigger case processing + intimation
-            if '[WA_COLLECTION_COMPLETE]' in response_text or '[FILING_COMPLETE]' in response_text:
+            # [FILING_COMPLETE] = a brand-new complaint filed entirely in this
+            # WhatsApp chat — create a fresh dispute. Updating linked_dispute
+            # here would silently overwrite the user's newest existing case.
+            if '[FILING_COMPLETE]' in response_text:
+                log.info(f"WhatsApp new filing complete for sender {sender_number}")
+                new_dispute = await _create_dispute_from_wa_conversation(
+                    db, sender_user_id, history, response_text
+                )
+                if new_dispute:
+                    from src.tasks.dispatcher import dispatch_buyer_and_seller_intimation
+                    if new_dispute.respondent_mobile:
+                        asyncio.create_task(
+                            dispatch_buyer_and_seller_intimation(
+                                dispute_id=str(new_dispute.id),
+                                user_id=sender_user_id,
+                            )
+                        )
+
+            # [WA_COLLECTION_COMPLETE] = remaining details collected for the
+            # already-linked dispute — update it in place.
+            elif '[WA_COLLECTION_COMPLETE]' in response_text:
                 log.info(f"WhatsApp collection complete for sender {sender_number}")
 
                 # Extract fields from the response and update dispute
                 if linked_dispute:
-                    fields_matches = re.findall(r'\[FIELDS\]([\s\S]*?)\[/FIELDS\]', response_text)
-                    wa_fields: dict = {}
-                    for match in fields_matches:
-                        try:
-                            wa_fields.update(json.loads(match))
-                        except json.JSONDecodeError:
-                            pass
+                    wa_fields = _extract_fields_blocks([response_text])
 
                     # Update dispute with WhatsApp-collected fields
                     field_map = {
