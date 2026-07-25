@@ -3,10 +3,10 @@
 from typing import Optional
 import uuid
 
+import httpx
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
-from sentence_transformers import SentenceTransformer
 
 from src.core.logging import log
 from src.config import settings
@@ -16,17 +16,24 @@ from src.config import settings
 LEGAL_COLLECTION = settings.get("QDRANT_COLLECTION", "odrmitra_legal")
 CASE_DOCS_COLLECTION = "odrmitra_case_docs"
 
+# OpenRouter accepts up to a few thousand inputs per call; stay conservative.
+_EMBED_BATCH_SIZE = 64
+
 
 class QdrantSearch:
-    """Search service using Qdrant for legal knowledge base and case documents."""
+    """Search service using Qdrant for legal knowledge base and case documents.
+
+    Embeddings come from the OpenRouter /embeddings API (OpenAI-compatible) —
+    no local model, so the backend runs in a few hundred MB instead of ~2GB.
+    """
 
     _client: Optional[QdrantClient] = None
-    _encoder: Optional[SentenceTransformer] = None
     _collections_initialized: set[str] = set()
 
     QDRANT_URL = settings.get("QDRANT_URL", "http://localhost:6333")
-    EMBEDDING_MODEL = settings.get("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-    EMBEDDING_DIMENSION = settings.get("EMBEDDING_DIMENSION", 384)
+    EMBEDDING_MODEL = settings.get("EMBEDDING_MODEL", "openai/text-embedding-3-small")
+    EMBEDDING_DIMENSION = settings.get("EMBEDDING_DIMENSION", 1536)
+    OPENROUTER_BASE_URL = settings.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
     @classmethod
     def get_client(cls) -> QdrantClient:
@@ -36,11 +43,30 @@ class QdrantSearch:
         return cls._client
 
     @classmethod
-    def get_encoder(cls) -> SentenceTransformer:
-        if cls._encoder is None:
-            cls._encoder = SentenceTransformer(cls.EMBEDDING_MODEL)
-            log.info(f"Loaded embedding model: {cls.EMBEDDING_MODEL}")
-        return cls._encoder
+    def embed_texts(cls, texts: list[str]) -> list[list[float]]:
+        """Embed texts via OpenRouter. Returns vectors in input order."""
+        api_key = settings.get("OPENROUTER_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("OPENROUTER_API_KEY is not configured")
+
+        vectors: list[list[float]] = []
+        for start in range(0, len(texts), _EMBED_BATCH_SIZE):
+            batch = texts[start:start + _EMBED_BATCH_SIZE]
+            resp = httpx.post(
+                f"{cls.OPENROUTER_BASE_URL}/embeddings",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={"model": cls.EMBEDDING_MODEL, "input": batch},
+                timeout=60.0,
+            )
+            resp.raise_for_status()
+            data = resp.json()["data"]
+            vectors.extend(
+                item["embedding"] for item in sorted(data, key=lambda x: x["index"])
+            )
+        return vectors
 
     @classmethod
     def ensure_collection(cls, collection_name: str = LEGAL_COLLECTION) -> str:
@@ -96,13 +122,14 @@ class QdrantSearch:
     ) -> int:
         """Index text chunks into a Qdrant collection."""
         client = cls.get_client()
-        encoder = cls.get_encoder()
         cls.ensure_collection(collection_name)
 
+        contents = [chunk["content"] for chunk in chunks]
+        embeddings = cls.embed_texts(contents) if contents else []
+
         points = []
-        for chunk in chunks:
+        for chunk, embedding in zip(chunks, embeddings):
             content = chunk["content"]
-            embedding = encoder.encode(content, show_progress_bar=False).tolist()
 
             payload = {
                 "content": content,
@@ -136,17 +163,18 @@ class QdrantSearch:
         query: str,
         collection_name: str = LEGAL_COLLECTION,
         limit: int = 5,
-        score_threshold: float = 0.3,
+        # text-embedding-3-small cosine scores run lower than MiniLM's did —
+        # relevant hits commonly land around 0.25-0.5.
+        score_threshold: float = 0.2,
         source_filter: str | None = None,
         filters: dict | None = None,
     ) -> list[dict]:
         """Search for relevant document chunks in a specific collection."""
         client = cls.get_client()
-        encoder = cls.get_encoder()
         cls.ensure_collection(collection_name)
 
         try:
-            query_vector = encoder.encode(query, show_progress_bar=False).tolist()
+            query_vector = cls.embed_texts([query])[0]
 
             must_conditions = [
                 models.FieldCondition(

@@ -30,9 +30,11 @@ jwt_expire_minutes = 1440  # 24 hours
 default_llm_provider = "deepseek"
 default_llm_model = "deepseek-v4-flash"
 
-# Embedding Model (sentence-transformers - local, free)
-embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
-embedding_dimension = 384
+# Embeddings — OpenRouter /embeddings API (OpenAI-compatible). Keeps the
+# backend at a few hundred MB of RAM instead of ~2GB for a local model.
+embedding_model = "openai/text-embedding-3-small"
+embedding_dimension = 1536
+openrouter_base_url = "https://openrouter.ai/api/v1"
 
 # ODR Workflow
 # Days the respondent has to file their SOD after intimation (Section 18).

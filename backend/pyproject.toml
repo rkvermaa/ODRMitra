@@ -33,9 +33,8 @@ dependencies = [
     "langchain>=1.2.10,<1.3.0",
     "langchain-openai>=1.1.10,<1.2.0",
     "langchain-community>=0.4.1,<0.5.0",
-    # RAG - Qdrant + sentence-transformers
+    # RAG - Qdrant (embeddings come from the OpenRouter API — no local model)
     "qdrant-client>=1.17.0,<1.18.0",
-    "sentence-transformers>=5.2.3,<6.0.0",
     # Document Processing
     "llama-parse>=0.6.94,<0.7.0",
     "pypdf>=6.7.1,<7.0.0",
