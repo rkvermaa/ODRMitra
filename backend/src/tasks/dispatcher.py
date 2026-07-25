@@ -220,6 +220,46 @@ async def dispatch_case_processing(dispute_id: str, user_id: str):
         log.error(f"dispatch_case_processing failed for dispute {dispute_id}: {e}")
 
 
+def _build_buyer_intimation(dispute, claimant) -> str:
+    """Section 18 intimation notice sent to the buyer on WhatsApp.
+
+    Names who filed (seller + organization), against whom, for how much,
+    and what the buyer must do next.
+    """
+    claimant_name = claimant.name if claimant else "An MSME seller"
+    if claimant and claimant.organization_name:
+        claimant_name += f" ({claimant.organization_name})"
+
+    amount = (
+        f"₹{dispute.claimed_amount:,.2f}" if dispute.claimed_amount
+        else f"₹{dispute.invoice_amount:,.2f}" if dispute.invoice_amount
+        else "the claimed amount"
+    )
+    filed_on = dispute.created_at.strftime("%d %b %Y") if dispute.created_at else ""
+
+    lines = [
+        "⚖️ *INTIMATION NOTICE — ODRMitra*",
+        "",
+        f"*Case No:* {dispute.case_number}" + (f" | Filed on {filed_on}" if filed_on else ""),
+        "",
+        f"*{claimant_name}* has filed a delayed-payment complaint against "
+        f"*{dispute.respondent_name or 'you'}* under the MSMED Act 2006.",
+        "",
+        f"*Claim Amount:* {amount}",
+    ]
+    if dispute.goods_services_description:
+        lines.append(f"*Goods/Services:* {dispute.goods_services_description}")
+    lines += [
+        "",
+        "As per *Section 18, MSMED Act 2006*, you are requested to respond "
+        "within *15 days*. Aap is message ka reply karke apna paksh (Statement "
+        "of Defense) de sakte hain ya settlement propose kar sakte hain.",
+        "",
+        "— ODRMitra (ओडीआर मित्र) | AI-Enabled ODR Platform",
+    ]
+    return "\n".join(lines)
+
+
 async def dispatch_buyer_intimation(
     dispute_id: str,
     user_id: str,
@@ -231,6 +271,7 @@ async def dispatch_buyer_intimation(
 
         from src.db.session import async_session_factory
         from src.db.models.dispute import Dispute
+        from src.db.models.user import User
         from sqlalchemy import select
 
         async with async_session_factory() as db:
@@ -241,16 +282,11 @@ async def dispatch_buyer_intimation(
             if not dispute:
                 return
 
-            amount = f"₹{dispute.invoice_amount:,.2f}" if dispute.invoice_amount else "the claimed amount"
+            claimant = (
+                await db.execute(select(User).where(User.id == dispute.claimant_id))
+            ).scalar_one_or_none()
 
-            message = (
-                f"INTIMATION NOTICE\n\n"
-                f"An ODR complaint (Case: {dispute.case_number}) has been filed "
-                f"against you regarding delayed payment of {amount}.\n\n"
-                f"Please respond within 15 days as per MSMED Act 2006, Section 18.\n\n"
-                f"For details, visit ODRMitra or reply to this message.\n\n"
-                f"— ODRMitra (AI-Enabled ODR Platform)"
-            )
+            message = _build_buyer_intimation(dispute, claimant)
 
             session_id = await _get_baileys_session_id()
             if not session_id:
@@ -378,17 +414,7 @@ async def dispatch_buyer_and_seller_intimation(dispute_id: str, user_id: str):
 
                 # 2. Send buyer intimation if respondent_mobile exists
                 if dispute.respondent_mobile:
-                    amount = f"₹{dispute.invoice_amount:,.2f}" if dispute.invoice_amount else "the claimed amount"
-                    buyer_msg = (
-                        f"INTIMATION NOTICE\n\n"
-                        f"An ODR complaint (Case: {dispute.case_number}) has been filed "
-                        f"against you regarding delayed payment of {amount}.\n\n"
-                        f"Complainant: {claimant.name if claimant else 'N/A'}\n"
-                        f"Regarding: {dispute.goods_services_description or 'N/A'}\n\n"
-                        f"Please respond within 15 days as per MSMED Act 2006, Section 18.\n\n"
-                        f"For details, visit ODRMitra or reply to this message.\n\n"
-                        f"— ODRMitra (AI-Enabled ODR Platform)"
-                    )
+                    buyer_msg = _build_buyer_intimation(dispute, claimant)
                     await client.post(
                         f"{baileys_url}/sessions/{session_id}/send",
                         json={"to": _normalize_mobile(dispute.respondent_mobile), "message": buyer_msg},
