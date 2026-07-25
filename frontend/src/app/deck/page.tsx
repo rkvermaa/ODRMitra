@@ -111,7 +111,7 @@ function TitleSlide() {
       </p>
 
       <div className="mt-10 flex items-center gap-4">
-        <LivePill label="DEPLOYED & LIVE" />
+        <LivePill label="WORKING PoC · LIVE" />
         <span className="font-mono text-lg text-saffron-300">{LIVE_URL}</span>
       </div>
     </div>
@@ -192,7 +192,7 @@ function SolutionSlide() {
       <div className="mt-10 flex items-center gap-3 text-lg text-navy-100">
         <CheckCircle2 className="h-5 w-5 text-green-400" />
         Three channels, one AI brain — every action aligned with the MSMED Act 2006
-        <LivePill label="ALL LIVE TODAY" />
+        <LivePill label="WORKING IN THE PoC" />
       </div>
     </div>
   );
@@ -339,8 +339,8 @@ function ArchitectureSlide() {
 function JourneySlide() {
   return (
     <div className="flex h-full flex-col justify-center">
-      <Kicker>Complete Coverage</Kicker>
-      <SlideTitle>The full Section 18 journey — including the hard parts</SlideTitle>
+      <Kicker>What the PoC Demonstrates</Kicker>
+      <SlideTitle>The Section 18 journey, working end to end</SlideTitle>
 
       <div className="mt-10 grid grid-cols-2 gap-6">
         <GlowBox>
@@ -391,9 +391,14 @@ function JourneySlide() {
         </div>
       </div>
 
-      <p className="mt-8 text-center text-lg text-navy-200">
+      <p className="mt-6 text-center text-lg text-navy-200">
         Steps 8–16 (MSEFC, conciliation, arbitration) tracked on the dashboard —
         humans decide, the platform keeps everyone informed
+      </p>
+      <p className="mt-3 text-center text-[15px] text-navy-300">
+        PoC scope: exact document requirements, MSEFC formats, and state-level
+        variations will be refined with the Ministry in Stage 1 — the
+        architecture absorbs them without redesign
       </p>
     </div>
   );
@@ -411,7 +416,7 @@ function CapabilitiesSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>Problem Statement · Use Case Mapping</Kicker>
-      <SlideTitle>All six required AI capabilities — shipped</SlideTitle>
+      <SlideTitle>All six asked-for capabilities, working in the PoC</SlideTitle>
 
       <div className="mt-10 grid grid-cols-3 gap-5">
         {caps.map(([Icon, title, desc]) => {
@@ -432,6 +437,11 @@ function CapabilitiesSlide() {
           );
         })}
       </div>
+
+      <p className="mt-8 text-center text-[15px] text-navy-300">
+        Each is a working first implementation — Stage 1 validates and hardens
+        them against real SAMADHAAN case data with the Ministry
+      </p>
     </div>
   );
 }
