@@ -253,6 +253,55 @@ async def create_dispute(
     db.add(dispute)
     await db.flush()
     await db.refresh(dispute)
+    await db.commit()
+
+    # Step 3 (Intimation): as soon as a case is saved, the buyer must be
+    # notified and the seller gets the WhatsApp follow-up that collects the
+    # remaining details (invoice, GSTIN, PO, ...) one by one.
+    import asyncio
+
+    dispute_id = str(dispute.id)
+    if dispute.respondent_mobile:
+        from src.tasks.dispatcher import dispatch_buyer_and_seller_intimation
+
+        asyncio.create_task(
+            dispatch_buyer_and_seller_intimation(dispute_id=dispute_id, user_id=user_id)
+        )
+    else:
+        # No buyer mobile yet — still start the seller follow-up so WhatsApp
+        # can collect it (and the rest) chat by chat.
+        from src.db.models.user import User
+        from src.tasks.dispatcher import dispatch_whatsapp_followup
+
+        claimant = (
+            await db.execute(select(User).where(User.id == user_id))
+        ).scalar_one_or_none()
+        if claimant and claimant.mobile_number:
+            provided = {
+                field: value
+                for field, value in {
+                    "title": dispute.title,
+                    "respondent_name": dispute.respondent_name,
+                    "respondent_mobile": dispute.respondent_mobile,
+                    "seller_mobile": claimant.mobile_number,
+                    "goods_services_description": dispute.goods_services_description,
+                    "invoice_amount": dispute.invoice_amount,
+                    "respondent_email": dispute.respondent_email,
+                    "respondent_gstin": dispute.respondent_gstin,
+                    "respondent_state": dispute.respondent_state,
+                    "respondent_address": dispute.respondent_address,
+                    "po_number": dispute.po_number,
+                }.items()
+                if value
+            }
+            asyncio.create_task(
+                dispatch_whatsapp_followup(
+                    user_id=user_id,
+                    dispute_id=dispute_id,
+                    seller_mobile=claimant.mobile_number,
+                    collected_fields=provided,
+                )
+            )
 
     return _dispute_to_response(dispute)
 
