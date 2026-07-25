@@ -284,7 +284,22 @@ export async function sendMessage(userId, to, message) {
   if (!session || session.status !== 'connected') {
     throw new Error(`Session not connected for user ${userId}`);
   }
-  const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+  let jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
+
+  // Prefer the contact's LID identity when one exists: chats migrated to
+  // WhatsApp's privacy LIDs render messages sent to the plain phone JID as
+  // empty "waiting for this message" bubbles on the recipient's device.
+  if (jid.endsWith('@s.whatsapp.net')) {
+    try {
+      const mapped = await session.socket.signalRepository?.lidMapping?.getLIDForPN?.(jid);
+      const lidJid = typeof mapped === 'string' ? mapped : mapped?.id;
+      if (lidJid && lidJid.endsWith('@lid')) {
+        logger.info(`sendMessage: routing ${jid} via LID ${lidJid}`);
+        jid = lidJid;
+      }
+    } catch (e) { /* no mapping — keep the phone JID */ }
+  }
+
   try {
     stopTyping(userId, jid);
     try { await session.socket.sendPresenceUpdate('paused', jid); } catch (e) { /* ignore */ }
