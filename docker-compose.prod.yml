@@ -1,0 +1,84 @@
+# ODRMitra production stack — deployed on the DO droplet alongside (stopped)
+# pcs-pyq. Separate project name, separate volumes, host ports bound to
+# localhost only (Caddy terminates TLS and proxies to the frontend).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Ports chosen to never collide with the pcs_pyq stack (3000-3002, 5432,
+# 6379, 8000, 8001) so both stacks could even run side by side if RAM allowed.
+
+name: odrmitra
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: odrmitra_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: odrmitra
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - odrmitra_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d odrmitra"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: odrmitra_qdrant
+    restart: unless-stopped
+    volumes:
+      - odrmitra_qdrant_data:/qdrant/storage
+
+  backend:
+    build: ./backend
+    container_name: odrmitra_backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: default
+      APP_DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/odrmitra
+      APP_QDRANT_URL: http://qdrant:6333
+      APP_BAILEYS_SERVICE_URL: http://baileys:3001
+    volumes:
+      # Secrets are never baked into the image — mounted read-only at runtime.
+      - ./backend/config/.secrets.toml:/app/config/.secrets.toml:ro
+      # Legal PDFs for RAG indexing (indexer default resolves /odr-docs/rag-index).
+      - ./odr-docs:/odr-docs:ro
+    ports:
+      - "127.0.0.1:8100:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    container_name: odrmitra_frontend
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:3100:3000"
+    depends_on:
+      - backend
+
+  baileys:
+    build: ./baileys-service
+    container_name: odrmitra_baileys
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+      BACKEND_WEBHOOK_URL: http://backend:8000/api/v1/channel/whatsapp/webhook
+    depends_on:
+      - backend
+
+volumes:
+  odrmitra_postgres_data:
+    name: odrmitra_postgres_data
+  odrmitra_qdrant_data:
+    name: odrmitra_qdrant_data
