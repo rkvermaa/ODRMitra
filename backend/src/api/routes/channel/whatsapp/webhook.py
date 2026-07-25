@@ -135,6 +135,29 @@ async def handle_baileys_message(
 
     log.info(f"WhatsApp message from {sender_name} ({sender}) via session {baileys_session_id}: {message_text[:50]}...")
 
+    # Ack immediately and run the agent in the background — Baileys' webhook
+    # call must not sit open for the whole agent turn (long replies used to
+    # hit its 120s client timeout). The reply is delivered via /send anyway.
+    asyncio.create_task(
+        _process_and_reply(
+            baileys_session_id=baileys_session_id,
+            sender=sender,
+            sender_name=sender_name,
+            sender_jid=sender_jid,
+            message_text=message_text,
+        )
+    )
+    return {"status": "accepted"}
+
+
+async def _process_and_reply(
+    baileys_session_id: str,
+    sender: str,
+    sender_name: str,
+    sender_jid: str,
+    message_text: str,
+) -> None:
+    """Run the agent for an inbound WhatsApp message and send the reply."""
     try:
         response_text = await process_whatsapp_message(
             baileys_session_id=baileys_session_id,
@@ -151,11 +174,8 @@ async def handle_baileys_message(
                 message=response_text,
             )
 
-        return {"status": "processed"}
-
     except Exception as e:
         log.exception(f"Failed to process WhatsApp message: {e}")
-        return {"status": "error", "reason": str(e)}
 
 
 @router.post("/status")
