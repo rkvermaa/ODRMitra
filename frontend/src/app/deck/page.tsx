@@ -490,21 +490,19 @@ function JourneySlide() {
 }
 
 function CapabilitiesSlide() {
-  // Card titles mirror the Problem Statement 1 use-case clauses verbatim.
+  // Only what the live demo actually shows — nothing aspirational.
   const caps = [
-    [Mic, "Voice-based inputs, automated form-population", "Speak in Hindi/English/Hinglish — the Statement of Claim fills itself"],
-    [FileSearch, "Analysing claims & supporting documentation", "Amounts, dates, and parties extracted from what is filed"],
-    [Layers, "Sub-category classification & missing-document detection", "Each case typed with confidence; documentation gaps flagged"],
-    [TrendingUp, "Predicting probable resolution outcomes", "Grounded in statutory provisions and precedent, with a settlement range"],
-    [MessageSquare, "Multilingual, real-time AI-guided negotiation", "Both parties, one assistant, on the channel they already use"],
-    [FileSignature, "Automated drafting of settlement agreements", "Section 16 interest computed; agreement delivered to both parties"],
+    [Mic, "Voice-based case filing", "Speak in Hindi/English/Hinglish — the Statement of Claim fills itself, no form"],
+    [MessageSquare, "The case lives on WhatsApp", "Buyer intimation, status updates, missing details, and the buyer's own defense — one chat thread for both parties"],
+    [TrendingUp, "AI outcome prediction", "Probable resolution grounded in statutory provisions, with Section 16 interest computed"],
+    [FileSignature, "Settlement drafted & delivered", "On mutual agreement, the formal agreement is generated and sent to both parties automatically"],
   ];
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>1 · Overview — Alignment with the Use Case</Kicker>
-      <SlideTitle>The use case&apos;s six asks, working in the PoC</SlideTitle>
+      <SlideTitle>What you&apos;ll see working today</SlideTitle>
 
-      <div className="mt-10 grid grid-cols-3 gap-5">
+      <div className="mt-10 grid grid-cols-2 gap-5">
         {caps.map(([Icon, title, desc]) => {
           const I = Icon as React.ComponentType<{ className?: string }>;
           return (
@@ -513,10 +511,10 @@ function CapabilitiesSlide() {
                 <I className="h-7 w-7 text-[#d9b36a]" />
                 <LivePill />
               </div>
-              <p className="mt-3 text-lg font-semibold text-white">
+              <p className="mt-3 text-xl font-semibold text-white">
                 {title as string}
               </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#a3aec3]">
+              <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
                 {desc as string}
               </p>
             </GlowBox>
