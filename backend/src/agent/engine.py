@@ -1,7 +1,8 @@
 """Agent Engine — orchestrator that picks the right agent based on channel.
 
 - Voice channel → VoiceAgent (single LLM call, fast, no tools, seller profile injected)
-- WhatsApp/web/telegram → ReactAgent (ReAct loop with tools)
+- WhatsApp → WhatsAppGraph (LangGraph router → new/existing/general branches)
+- Web/telegram → ReactAgent (ReAct loop with tools)
 """
 
 from typing import Any
@@ -9,10 +10,11 @@ from typing import Any
 from src.core.logging import log
 from src.agent.voice_agent import VoiceAgent
 from src.agent.react_agent import ReactAgent
+from src.agent.whatsapp_graph import WhatsAppGraph
 
 
 class AgentEngine:
-    """Thin orchestrator — delegates to VoiceAgent or ReactAgent.
+    """Thin orchestrator — delegates to VoiceAgent, WhatsAppGraph, or ReactAgent.
 
     Maintains the same interface so callers (chat.py, webhook.py) don't change.
     For voice channel, fetches seller profile from DB before processing.
@@ -31,9 +33,15 @@ class AgentEngine:
         self.channel = channel
 
         # For non-voice channels, create agent immediately
-        self._agent: VoiceAgent | ReactAgent | None = None
+        self._agent: VoiceAgent | ReactAgent | WhatsAppGraph | None = None
 
-        if channel != "voice":
+        if channel == "whatsapp":
+            self._agent = WhatsAppGraph(
+                user_id=user_id,
+                session_id=session_id,
+                dispute_id=dispute_id,
+            )
+        elif channel != "voice":
             self._agent = ReactAgent(
                 user_id=user_id,
                 session_id=session_id,
@@ -41,10 +49,12 @@ class AgentEngine:
                 channel=channel,
             )
 
-        log.info(
-            f"AgentEngine: channel={channel} → "
-            f"{'VoiceAgent (lazy)' if channel == 'voice' else 'ReactAgent'}"
+        agent_name = (
+            "VoiceAgent (lazy)" if channel == "voice"
+            else "WhatsAppGraph" if channel == "whatsapp"
+            else "ReactAgent"
         )
+        log.info(f"AgentEngine: channel={channel} → {agent_name}")
 
     async def _get_voice_agent(self) -> VoiceAgent:
         """Create VoiceAgent with seller profile (and dispute context if existing case)."""

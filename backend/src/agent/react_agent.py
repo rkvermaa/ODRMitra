@@ -28,11 +28,17 @@ class ReactAgent:
         session_id: str,
         dispute_id: str | None = None,
         channel: str = "whatsapp",
+        forced_skill: str | None = None,
+        extra_tools: list[str] | None = None,
     ):
         self.user_id = user_id
         self.session_id = session_id
         self.dispute_id = dispute_id
         self.channel = channel
+        # Set by orchestrators (e.g. the WhatsApp LangGraph router) that decide
+        # the skill deterministically instead of via keyword discovery.
+        self.forced_skill = forced_skill
+        self.extra_tools = extra_tools or []
         self.llm = get_llm_client()
         self.tool_registry = ToolRegistry()
         self._tool_calls_made: list[dict] = []
@@ -42,6 +48,9 @@ class ReactAgent:
         all_skills = SkillLoader.load_all_skills()
         if not all_skills:
             return None
+
+        if self.forced_skill and self.forced_skill in all_skills:
+            return all_skills[self.forced_skill]
 
         message_lower = message.lower()
 
@@ -92,8 +101,11 @@ class ReactAgent:
         return all_skills.get("legal-info")
 
     def _setup_tools(self, skill: dict[str, Any]) -> None:
-        """Enable tools for the discovered skill."""
-        tool_names = skill.get("tools", [])
+        """Enable tools for the discovered skill (plus any orchestrator extras)."""
+        tool_names = list(skill.get("tools", []))
+        for tool in self.extra_tools:
+            if tool not in tool_names:
+                tool_names.append(tool)
         skill_slug = skill.get("slug", "")
         enabled = self.tool_registry.enable_tools_for_skill(tool_names, skill_slug)
         log.debug(f"Enabled {enabled} tools for skill: {skill_slug}")
@@ -141,13 +153,16 @@ class ReactAgent:
         (e.g. the WhatsApp sender's own mobile number)."""
         try:
             from src.agent.context.loader import (
+                build_case_list_context,
                 build_dispute_context,
                 build_seller_context,
                 load_dispute_context,
                 load_seller_profile,
+                load_user_disputes,
             )
             from src.db.session import async_session_factory
 
+            case_list_block = ""
             async with async_session_factory() as db:
                 profile = await load_seller_profile(self.user_id, db)
                 dispute_info = (
@@ -155,8 +170,17 @@ class ReactAgent:
                     if self.dispute_id
                     else {}
                 )
+                if self.channel == "whatsapp":
+                    # WhatsApp users navigate by chat alone — give the agent
+                    # every complaint so it can offer them as options.
+                    disputes = await load_user_disputes(self.user_id, db)
+                    case_list_block = build_case_list_context(disputes)
 
-            blocks = [build_seller_context(profile), build_dispute_context(dispute_info)]
+            blocks = [
+                build_seller_context(profile),
+                case_list_block,
+                build_dispute_context(dispute_info),
+            ]
             return "\n\n".join(b for b in blocks if b)
         except Exception as e:
             log.warning(f"Failed to load context blocks for prompt: {e}")
