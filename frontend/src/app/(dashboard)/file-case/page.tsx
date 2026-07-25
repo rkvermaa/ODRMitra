@@ -492,12 +492,14 @@ export default function FileCasePage() {
       responseAudioRef.current.currentTime = 0;
     }
 
+    const gen = callGenRef.current;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: true, noiseSuppression: true },
       });
-      // Stop may have been clicked while the mic was being acquired.
-      if (!conversationActiveRef.current || stoppingRef.current) {
+      // End Call may have been clicked while the mic was being acquired.
+      if (gen !== callGenRef.current || !conversationActiveRef.current || stoppingRef.current) {
         stream.getTracks().forEach((t) => t.stop());
         setPhase("idle");
         return;
@@ -584,6 +586,8 @@ export default function FileCasePage() {
 
       // No-speech timeout: if user doesn't speak within 5s, nudge and repeat last question
       noSpeechTimerRef.current = setTimeout(async () => {
+        // Never nudge a call that was ended after this timer was scheduled
+        if (gen !== callGenRef.current) return;
         if (isRecordingRef.current && !hasSpokenRef.current) {
           // User hasn't spoken — stop recording silently
           stoppingRef.current = true;
@@ -594,7 +598,7 @@ export default function FileCasePage() {
           cleanupRecording();
           stoppingRef.current = false;
 
-          if (!conversationActiveRef.current) {
+          if (gen !== callGenRef.current || !conversationActiveRef.current) {
             setPhase("idle");
             return;
           }
@@ -724,17 +728,9 @@ export default function FileCasePage() {
     hasSpokenRef.current = false;
   };
 
-  const toggleMic = useCallback(() => {
-    if (conversationActiveRef.current) {
-      // Conversation is running — stop it
-      stopConversation();
-    } else if (phase !== "finalizing") {
-      // Start continuous conversation loop (never during the save/redirect)
-      conversationActiveRef.current = true;
-      setConversationActive(true);
-      startRecording();
-    }
-  }, [stopConversation, startRecording, phase]);
+  // The active screen has no restart — End Call always ends and returns to
+  // the start screen. A toggle here caused clicks to silently RE-ARM the mic
+  // whenever internal state had already flipped inactive.
 
   const startSession = async () => {
     setActive(true);
@@ -977,27 +973,14 @@ export default function FileCasePage() {
             </span>
           </div>
 
-          {/* Mic / Stop button */}
+          {/* End Call — always ends, never toggles */}
           <button
-            onClick={toggleMic}
+            onClick={stopConversation}
             disabled={phase === "finalizing"}
-            className={`mt-4 flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-              conversationActive
-                ? "bg-red-600 text-white shadow-lg shadow-red-500/30 hover:bg-red-700"
-                : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl"
-            }`}
+            className="mt-4 flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-red-500/30 transition-all duration-300 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {conversationActive ? (
-              <>
-                <PhoneOff className="h-4 w-4" />
-                End Call
-              </>
-            ) : (
-              <>
-                <Mic className="h-4 w-4" />
-                Start Speaking
-              </>
-            )}
+            <PhoneOff className="h-4 w-4" />
+            End Call
           </button>
 
           {/* Mute toggle */}
