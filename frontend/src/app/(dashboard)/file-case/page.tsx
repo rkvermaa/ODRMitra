@@ -790,12 +790,13 @@ export default function FileCasePage() {
   if (!active) {
     return (
       <div
-        className="flex items-center justify-center"
+        className="flex items-center justify-center overflow-x-hidden px-2"
         style={{ minHeight: "calc(100vh - 140px)" }}
       >
-        <div className="flex w-full max-w-4xl gap-12">
+        {/* Mobile: orb + start on top, text below; desktop: side by side */}
+        <div className="flex w-full max-w-4xl flex-col-reverse items-center gap-8 md:flex-row md:items-stretch md:gap-12">
           {/* Left: Description + Mode Selector */}
-          <div className="flex-1 pt-8">
+          <div className="w-full flex-1 md:pt-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               AI Case Filing Assistant
             </h1>
@@ -921,7 +922,7 @@ export default function FileCasePage() {
           </div>
 
           {/* Right: Orb + Start Button */}
-          <div className="flex flex-col items-center justify-center gap-8">
+          <div className="flex flex-col items-center justify-center gap-6 md:gap-8">
             <GradientOrb phase="idle" />
             <button
               onClick={startSession}
@@ -939,11 +940,13 @@ export default function FileCasePage() {
 
   // ─── ACTIVE STATE ───
   return (
-    <div className="flex h-[calc(100vh-140px)] gap-0">
+    // Mobile: single column (fields panel hidden — a compact progress pill
+    // shows instead); desktop: conversation + fields side by side.
+    <div className="flex h-[calc(100dvh-140px)] flex-col gap-0 overflow-x-hidden lg:flex-row">
       {/* ─── LEFT: Orb + Conversation ─── */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
         {/* Orb section */}
-        <div className="flex flex-col items-center justify-center py-6 relative">
+        <div className="relative flex flex-col items-center justify-center py-4 md:py-6">
           <GradientOrb phase={phase} />
 
           {/* Phase label */}
@@ -984,6 +987,14 @@ export default function FileCasePage() {
             <PhoneOff className="h-4 w-4" />
             End Call
           </button>
+
+          {/* Mobile-only compact progress (fields panel is desktop-only) */}
+          {mode === "new-case" && (
+            <div className="mt-3 flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 lg:hidden">
+              <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+              {filledCount}/{FIELD_ORDER.length} details collected
+            </div>
+          )}
 
           {/* Mute toggle */}
           <button
@@ -1059,9 +1070,9 @@ export default function FileCasePage() {
         </div>
       </div>
 
-      {/* ─── RIGHT: Case Fields Panel (new-case only) ─── */}
+      {/* ─── RIGHT: Case Fields Panel (new-case only, desktop) ─── */}
       {mode === "new-case" && (
-      <div className="w-80 shrink-0 border-l border-gray-100 bg-gray-50/50 flex flex-col overflow-hidden">
+      <div className="hidden w-80 shrink-0 border-l border-gray-100 bg-gray-50/50 lg:flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <div>
