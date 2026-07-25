@@ -29,6 +29,32 @@ from src.agent.prompts.whatsapp import WHATSAPP_GREETING_PROMPT, WHATSAPP_RULES_
 # must follow — merged into the prompt instead of routed to exclusively.
 _PROCESS_SKILLS = ("case-filing", "whatsapp-filing")
 
+# On WhatsApp, persistence happens through TOOLS, not text tags — tool calls
+# are what an autonomous agent executes reliably. This section is appended
+# LAST so it supersedes the [FIELDS]/[FILING_COMPLETE] instructions that the
+# merged skill processes carry for the voice/web channels.
+_TOOL_SAVING_OVERRIDE = """\
+## DATA SAVING ON WHATSAPP — OVERRIDES THE [FIELDS] TAG RULES ABOVE
+
+On this channel do NOT emit [FIELDS], [FILING_COMPLETE], or
+[WA_COLLECTION_COMPLETE] tags. Persist data by CALLING TOOLS:
+
+1. Existing case — the moment the user provides ANY detail (buyer email,
+   GSTIN, state, address, PO number, cause of action...), call
+   `save_case_details` with that case's dispute_id and the detail. One
+   answer = one immediate save. Never batch, never wait for the rest.
+   When the last key detail arrives (buyer email or GSTIN + state + PO
+   number), include filing_complete=true in that same call.
+2. New complaint — collect the basics one by one (buyer name, buyer mobile,
+   what was supplied, invoice amount; the user's own name and mobile come
+   from SELLER INFO). Then call `create_new_case` — it files the case AND
+   sends the buyer the Section 18 intimation. Share the returned case
+   number with the user.
+
+Never claim something is saved unless the tool call succeeded — report the
+tool's actual result.\
+"""
+
 
 class WhatsAppAgent:
     """Autonomous WhatsApp agent: all tools, unified prompt, native loop."""
@@ -148,6 +174,7 @@ class WhatsAppAgent:
             WHATSAPP_GREETING_PROMPT,
             WHATSAPP_RULES_PROMPT,
             *skill_sections,
+            _TOOL_SAVING_OVERRIDE,
         ]
         return "\n\n".join(p for p in parts if p)
 

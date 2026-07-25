@@ -434,38 +434,61 @@ async def process_whatsapp_message(
                             )
                         )
 
-            # [WA_COLLECTION_COMPLETE] = remaining details collected for the
-            # already-linked dispute — update it in place.
-            elif '[WA_COLLECTION_COMPLETE]' in response_text:
-                log.info(f"WhatsApp collection complete for sender {sender_number}")
+            else:
+                # Progressive save: persist collected [FIELDS] to the dispute
+                # after EVERY turn, not only at completion — a dropped chat
+                # must never lose answers already given.
+                wa_fields = _extract_fields_blocks([response_text])
+                if wa_fields:
+                    target = None
+                    # The agent tags which case it is collecting for; fall
+                    # back to the session-linked (latest) dispute.
+                    target_id = wa_fields.get("dispute_id")
+                    if target_id:
+                        try:
+                            result = await db.execute(
+                                select(Dispute).where(
+                                    Dispute.id == uuid.UUID(str(target_id)),
+                                    Dispute.claimant_id == sender_user.id,
+                                )
+                            )
+                            target = result.scalar_one_or_none()
+                        except (ValueError, TypeError):
+                            target = None
+                    if target is None:
+                        target = linked_dispute
 
-                # Extract fields from the response and update dispute
-                if linked_dispute:
-                    wa_fields = _extract_fields_blocks([response_text])
+                    if target is not None:
+                        field_map = {
+                            "respondent_email": "respondent_email",
+                            "respondent_gstin": "respondent_gstin",
+                            "respondent_state": "respondent_state",
+                            "respondent_district": "respondent_district",
+                            "respondent_pin_code": "respondent_pin_code",
+                            "respondent_address": "respondent_address",
+                            "respondent_mobile": "respondent_mobile",
+                            "respondent_name": "respondent_name",
+                            "po_number": "po_number",
+                            "cause_of_action": "cause_of_action",
+                            "seller_gstin": "respondent_pan",  # seller's GSTIN stored as claimant info
+                            "goods_services_description": "goods_services_description",
+                        }
+                        updated = []
+                        for src_field, dest_field in field_map.items():
+                            val = wa_fields.get(src_field)
+                            if val and not getattr(target, dest_field, None):
+                                setattr(target, dest_field, val)
+                                updated.append(dest_field)
 
-                    # Update dispute with WhatsApp-collected fields
-                    field_map = {
-                        "respondent_email": "respondent_email",
-                        "respondent_gstin": "respondent_gstin",
-                        "respondent_state": "respondent_state",
-                        "respondent_district": "respondent_district",
-                        "respondent_pin_code": "respondent_pin_code",
-                        "respondent_address": "respondent_address",
-                        "respondent_mobile": "respondent_mobile",
-                        "respondent_name": "respondent_name",
-                        "po_number": "po_number",
-                        "cause_of_action": "cause_of_action",
-                        "seller_gstin": "respondent_pan",  # seller's GSTIN stored as claimant info
-                        "goods_services_description": "goods_services_description",
-                    }
-                    for src_field, dest_field in field_map.items():
-                        val = wa_fields.get(src_field)
-                        if val and not getattr(linked_dispute, dest_field, None):
-                            setattr(linked_dispute, dest_field, val)
+                        if '[WA_COLLECTION_COMPLETE]' in response_text:
+                            target.status = DisputeStatus.FILED.value
+                            log.info(f"WhatsApp collection complete for {target.case_number}")
 
-                    linked_dispute.status = DisputeStatus.FILED.value
-                    await db.commit()
-                    log.info(f"Updated dispute {linked_dispute.id} with WhatsApp fields")
+                        if updated or '[WA_COLLECTION_COMPLETE]' in response_text:
+                            await db.commit()
+                            log.info(
+                                f"Progressively saved {updated or 'status'} to {target.case_number}"
+                            )
 
                     # Dispatch intimation to both parties
                     from src.tasks.dispatcher import dispatch_buyer_and_seller_intimation

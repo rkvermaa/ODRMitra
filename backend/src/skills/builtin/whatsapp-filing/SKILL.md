@@ -40,8 +40,10 @@ missing details one by one.
 
 ## FIELD EXTRACTION
 
-After EVERY user answer, include a [FIELDS] JSON block:
-[FIELDS]{"respondent_email": "buyer@email.com", "respondent_gstin": "29XXXXX1234"}[/FIELDS]
+After EVERY user answer, include a [FIELDS] JSON block. ALWAYS include the
+"dispute_id" of the case being completed (from USER'S COMPLAINTS / CASE
+DETAILS context) so each answer is saved to the RIGHT case immediately:
+[FIELDS]{"dispute_id": "<uuid>", "respondent_email": "buyer@email.com", "respondent_gstin": "29XXXXX1234"}[/FIELDS]
 
 Use these field names:
   seller_gstin, seller_pan, respondent_email, respondent_gstin,

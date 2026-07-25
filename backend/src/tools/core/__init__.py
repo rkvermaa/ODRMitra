@@ -9,6 +9,8 @@ from src.tools.core.calculate_interest import CalculateInterestTool
 from src.tools.core.get_statutory_provision import GetStatutoryProvisionTool
 from src.tools.core.search_knowledge import SearchKnowledgeTool
 from src.tools.core.lookup_cases import LookupCasesTool
+from src.tools.core.save_case_details import SaveCaseDetailsTool
+from src.tools.core.create_new_case import CreateNewCaseTool
 
 CORE_TOOLS: dict[str, type] = {
     "classify_dispute": ClassifyDisputeTool,
@@ -20,4 +22,6 @@ CORE_TOOLS: dict[str, type] = {
     "get_statutory_provision": GetStatutoryProvisionTool,
     "search_knowledge": SearchKnowledgeTool,
     "lookup_cases": LookupCasesTool,
+    "save_case_details": SaveCaseDetailsTool,
+    "create_new_case": CreateNewCaseTool,
 }
