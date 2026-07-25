@@ -76,6 +76,70 @@ def build_seller_context(profile: dict[str, Any]) -> str:
     return "\n".join(parts)
 
 
+async def load_user_disputes(user_id: str, db: AsyncSession) -> list[dict[str, Any]]:
+    """All disputes filed by this user (newest first) for the case-list block."""
+    from src.db.models.dispute import Dispute
+
+    try:
+        result = await db.execute(
+            select(Dispute)
+            .where(Dispute.claimant_id == user_id)
+            .options(selectinload(Dispute.documents))
+            .order_by(Dispute.created_at.desc())
+        )
+        disputes = result.scalars().all()
+    except Exception as e:
+        log.error(f"Failed to load user disputes: {e}")
+        return []
+
+    out: list[dict[str, Any]] = []
+    for d in disputes:
+        # What the filing still needs before the case can move forward —
+        # mirrors the whatsapp-filing skill's completion requirements.
+        missing: list[str] = []
+        if not (d.respondent_email or d.respondent_gstin):
+            missing.append("buyer email ya GSTIN")
+        if not d.respondent_state:
+            missing.append("buyer ka state")
+        if not d.po_number:
+            missing.append("PO number")
+        if not d.documents:
+            missing.append("invoice document")
+
+        out.append({
+            "id": str(d.id),
+            "case_number": d.case_number,
+            "title": d.title or "",
+            "status": d.status or "",
+            "claimed_amount": str(d.claimed_amount) if d.claimed_amount else "",
+            "respondent_name": d.respondent_name or "",
+            "missing": missing,
+        })
+    return out
+
+
+def build_case_list_context(disputes: list[dict[str, Any]]) -> str:
+    """Numbered list of the user's complaints for prompt injection."""
+    if not disputes:
+        return "## USER'S COMPLAINTS\nThis user has not filed any complaint yet."
+
+    parts = [f"## USER'S COMPLAINTS ({len(disputes)} total)"]
+    for i, d in enumerate(disputes, 1):
+        stage = STATUS_LABELS.get(d["status"], d["status"])
+        line = f"{i}. {d['case_number']} — {d['title']}"
+        if d["respondent_name"]:
+            line += f" | Buyer: {d['respondent_name']}"
+        if d["claimed_amount"]:
+            line += f" | Claimed: ₹{d['claimed_amount']}"
+        line += f" | Stage: {stage} | dispute_id: {d['id']}"
+        parts.append(line)
+        if d["missing"]:
+            parts.append(f"   Pending info needed to proceed: {', '.join(d['missing'])}")
+        else:
+            parts.append("   All key filing info received.")
+    return "\n".join(parts)
+
+
 async def load_dispute_context(dispute_id: str, user_id: str, db: AsyncSession) -> dict[str, Any]:
     """Fetch dispute details from DB for existing-case voice mode.
 
