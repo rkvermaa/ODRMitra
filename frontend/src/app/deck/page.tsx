@@ -523,11 +523,6 @@ function CapabilitiesSlide() {
           );
         })}
       </div>
-
-      <p className="mt-8 text-center text-[15px] text-[#76839f]">
-        Each is a working first implementation — Stage 1 validates and hardens
-        them against real SAMADHAAN case data with the Ministry
-      </p>
     </div>
   );
 }
