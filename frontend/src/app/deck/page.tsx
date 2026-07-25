@@ -565,52 +565,6 @@ function ComplianceSlide() {
   );
 }
 
-function MetricsSlide() {
-  return (
-    <div className="flex h-full flex-col justify-center">
-      <Kicker>Measured, Not Imagined</Kicker>
-      <SlideTitle>Numbers from the live deployment</SlideTitle>
-
-      <div className="mt-10 grid grid-cols-4 gap-5">
-        {[
-          ["3–5s", "WhatsApp agent replies (typing indicator live throughout)"],
-          ["~12s", "full voice turn — hear, understand, reply — every stage measured"],
-          ["208", "statutory chunks indexed from 8 legal documents"],
-          ["< ₹2k/mo", "entire platform footprint — runs in 1.5GB RAM"],
-        ].map(([v, l]) => (
-          <GlowBox key={l} className="text-center">
-            <p className="text-[44px] font-bold leading-none text-[#e8cd9a]">{v}</p>
-            <p className="mt-3 text-sm leading-relaxed text-[#a3aec3]">{l}</p>
-          </GlowBox>
-        ))}
-      </div>
-
-      <div className="mt-8 grid grid-cols-2 gap-5">
-        <GlowBox>
-          <p className="text-lg font-semibold text-white">
-            Proven this week, in production
-          </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
-            Real two-party dispute filed by voice, intimation delivered to a real
-            buyer&apos;s phone, defense recorded from WhatsApp, timeline advanced —
-            end to end on the deployed system.
-          </p>
-        </GlowBox>
-        <GlowBox>
-          <p className="text-lg font-semibold text-white">
-            Accuracy benchmarking — Stage 1 plan
-          </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
-            Extraction & classification accuracy will be validated against
-            AIKosh MSME-SAMADHAAN datasets with published methodology — we
-            present measured numbers, not estimates.
-          </p>
-        </GlowBox>
-      </div>
-    </div>
-  );
-}
-
 function ResilienceSlide() {
   const items = [
     [GitBranch, "Swappable AI — proven, not promised", "Our AI provider retired a model mid-build week. We switched to its successor the same day with a one-line change and zero downtime."],
@@ -716,15 +670,34 @@ function TeamSlide() {
         ))}
       </div>
 
-      <div className="mt-12 text-center">
-        <p className="mx-auto max-w-3xl text-[26px] font-medium leading-relaxed text-white">
-          “Every MSME seller in India should be able to file a payment dispute
-          by <span className="text-[#e8cd9a]">simply making a phone call</span>.”
-        </p>
-        <div className="mt-8 flex items-center justify-center gap-4">
-          <LivePill label="TRY IT NOW" />
-          <span className="font-mono text-xl text-[#e8cd9a]">https://{LIVE_URL}</span>
-        </div>
+    </div>
+  );
+}
+
+function ClosingSlide() {
+  return (
+    <div className="flex h-full flex-col items-center justify-center text-center">
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dcb877] to-[#a87f3d] shadow-2xl shadow-[#c9a45c]/40">
+        <Scale className="h-8 w-8 text-white" />
+      </div>
+
+      <p className="mt-12 max-w-4xl text-[40px] font-medium leading-snug text-white">
+        “Every MSME seller in India should be able to file a payment dispute by{" "}
+        <span className="bg-gradient-to-r from-[#eedbaa] to-[#c9a45c] bg-clip-text text-transparent">
+          simply making a phone call
+        </span>.”
+      </p>
+
+      <div className="mt-16 flex flex-col items-center gap-4">
+        <LivePill label="TRY IT NOW" />
+        <a
+          href={`https://${LIVE_URL}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-2xl text-[#e8cd9a] underline decoration-[#c9a45c]/50 underline-offset-8 transition-colors hover:text-white"
+        >
+          https://{LIVE_URL}
+        </a>
       </div>
     </div>
   );
@@ -735,16 +708,16 @@ const SLIDES: React.ComponentType[] = [
   ProblemSlide,
   SolutionSlide,
   DemoMapSlide,
-  DemoHighlightsSlide,
   ArchitectureSlide,
   PipelineSlide,
   JourneySlide,
   CapabilitiesSlide,
   ComplianceSlide,
-  MetricsSlide,
   ResilienceSlide,
   RoadmapSlide,
   TeamSlide,
+  DemoHighlightsSlide,
+  ClosingSlide,
 ];
 
 /* ── Deck shell ──────────────────────────────────────────────────── */
