@@ -21,6 +21,7 @@ status:
 warm:
     & "{{ justfile_directory() }}\scripts\stack.ps1" warm
 
-# Tail backend + frontend logs
-logs:
-    & "{{ justfile_directory() }}\scripts\stack.ps1" logs
+# Logs: `just logs` = snapshot of all; `just logs baileys` = follow one live
+# (services: backend | uvicorn | frontend | baileys)
+logs service="":
+    & "{{ justfile_directory() }}\scripts\stack.ps1" logs "{{ service }}"

@@ -3,7 +3,10 @@
 #
 # Ports on this machine (3000/4000/8000 are HNS-reserved and unbindable):
 #   backend  -> 127.0.0.1:8001   frontend -> 127.0.0.1:3002
-param([Parameter(Position = 0)][string]$Cmd = "status")
+param(
+    [Parameter(Position = 0)][string]$Cmd = "status",
+    [Parameter(Position = 1)][string]$Svc = ""
+)
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path $PSScriptRoot
@@ -200,12 +203,27 @@ switch ($Cmd) {
     "status" { Show-Status }
     "warm" { Warm-Agent }
     "logs" {
-        Write-Host "== backend.err.log (uvicorn) ==" -ForegroundColor Cyan
-        Get-Content (Join-Path $Logs "backend.err.log") -Tail 30
-        Write-Host "== frontend.out.log ==" -ForegroundColor Cyan
-        Get-Content (Join-Path $Logs "frontend.out.log") -Tail 20
-        Write-Host "== baileys.out.log ==" -ForegroundColor Cyan
-        Get-Content (Join-Path $Logs "baileys.out.log") -Tail 20 -ErrorAction SilentlyContinue
+        # `just logs <service>` follows that one live (Ctrl+C to stop);
+        # `just logs` prints a snapshot of all of them.
+        $files = @{
+            backend  = "app_$(Get-Date -Format yyyy-MM-dd).log"  # loguru app log
+            uvicorn  = "backend.err.log"
+            frontend = "frontend.out.log"
+            baileys  = "baileys.out.log"
+        }
+        if ($Svc) {
+            if (-not $files.ContainsKey($Svc)) {
+                throw "Unknown service '$Svc' (use: $($files.Keys -join ' | '))"
+            }
+            Get-Content (Join-Path $Logs $files[$Svc]) -Tail 40 -Wait
+        }
+        else {
+            foreach ($name in $files.Keys) {
+                Write-Host "== $name ($($files[$name])) ==" -ForegroundColor Cyan
+                Get-Content (Join-Path $Logs $files[$name]) -Tail 15 -ErrorAction SilentlyContinue
+                Write-Host ""
+            }
+        }
     }
     default { throw "Unknown command '$Cmd' (use: up | down | status | warm | logs)" }
 }
