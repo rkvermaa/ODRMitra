@@ -90,7 +90,11 @@ class SaveCaseDetailsTool(BaseTool):
                         saved.append(field)
 
                 if arguments.get("filing_complete"):
-                    dispute.status = DisputeStatus.FILED.value
+                    # Completion marks the case FILED — but never regress a
+                    # case that already advanced (e.g. intimation_sent).
+                    order = [s.value for s in DisputeStatus]
+                    if order.index(dispute.status) < order.index(DisputeStatus.FILED.value):
+                        dispute.status = DisputeStatus.FILED.value
 
                 await db.commit()
                 log.info(

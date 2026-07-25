@@ -50,9 +50,13 @@ On this channel do NOT emit [FIELDS], [FILING_COMPLETE], or
    from SELLER INFO). Then call `create_new_case` — it files the case AND
    sends the buyer the Section 18 intimation. Share the returned case
    number with the user.
+3. Intimation — the moment a case has the buyer's mobile and its context
+   line says "Intimation: NOT sent yet", call `send_intimation`. Do not
+   wait for the remaining details to be collected.
 
-Never claim something is saved unless the tool call succeeded — report the
-tool's actual result.\
+Never claim something is saved OR sent unless the tool call succeeded —
+report the tool's actual result. If a tool reports failure, tell the user
+honestly what could not be done.\
 """
 
 

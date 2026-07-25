@@ -125,6 +125,10 @@ async def load_user_disputes(user_id: str, db: AsyncSession) -> list[dict[str, A
             "status": d.status or "",
             "claimed_amount": str(d.claimed_amount) if d.claimed_amount else "",
             "respondent_name": d.respondent_name or "",
+            "respondent_mobile": d.respondent_mobile or "",
+            "intimation_sent_at": (
+                d.intimation_sent_at.strftime("%d %b %Y") if d.intimation_sent_at else ""
+            ),
             "missing": missing,
         })
     return out
@@ -223,6 +227,17 @@ def build_case_list_context(disputes: list[dict[str, Any]]) -> str:
             parts.append(f"   Pending info needed to proceed: {', '.join(d['missing'])}")
         else:
             parts.append("   All key filing info received.")
+        if d.get("intimation_sent_at"):
+            parts.append(f"   Intimation: SENT on {d['intimation_sent_at']}.")
+        elif d.get("respondent_mobile"):
+            parts.append(
+                "   Intimation: NOT sent yet — buyer mobile is on file, call "
+                "send_intimation now."
+            )
+        else:
+            parts.append(
+                "   Intimation: NOT sent — buyer mobile number needed first."
+            )
     return "\n".join(parts)
 
 
