@@ -7,9 +7,14 @@
  * - Sending/receiving messages
  */
 
+import dns from 'dns';
 import express from 'express';
 import pino from 'pino';
 import { config } from './config.js';
+
+// Prefer IPv4: WhatsApp resolves to Meta IPv6 addresses first, and on networks
+// without working IPv6 every socket connect times out (408) and no QR appears.
+dns.setDefaultResultOrder('ipv4first');
 import {
   startSession,
   getSessionStatus,
