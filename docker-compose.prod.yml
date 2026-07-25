@@ -57,7 +57,10 @@ services:
         condition: service_started
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        BACKEND_URL: http://backend:8000
     container_name: odrmitra_frontend
     restart: unless-stopped
     environment:

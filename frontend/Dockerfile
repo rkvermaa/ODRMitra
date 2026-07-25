@@ -1,5 +1,7 @@
 # ODRMitra frontend — Next.js production build.
-# BACKEND_URL is read at server start (next.config.ts rewrite), not build time.
+# Rewrites are BAKED AT BUILD TIME into the routes manifest, so the /api
+# proxy target must be supplied as a build arg (default = the compose
+# service name).
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -7,6 +9,8 @@ RUN npm ci
 
 FROM node:20-alpine AS build
 WORKDIR /app
+ARG BACKEND_URL=http://backend:8000
+ENV BACKEND_URL=$BACKEND_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
