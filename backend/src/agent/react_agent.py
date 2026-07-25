@@ -136,11 +136,27 @@ class ReactAgent:
 
         return "\n".join(parts)
 
+    async def _load_dispute_block(self) -> str:
+        """Load full case details for the prompt — same block the voice agent gets."""
+        if not self.dispute_id:
+            return ""
+        try:
+            from src.agent.context.loader import load_dispute_context, build_dispute_context
+            from src.db.session import async_session_factory
+
+            async with async_session_factory() as db:
+                info = await load_dispute_context(self.dispute_id, self.user_id, db)
+            return build_dispute_context(info)
+        except Exception as e:
+            log.warning(f"Failed to load dispute context for prompt: {e}")
+            return ""
+
     def _build_system_prompt(
         self,
         skill: dict[str, Any],
         rag_context: str,
         history: list[dict[str, Any]] | None = None,
+        dispute_block: str = "",
     ) -> str:
         """Build system prompt from base + skill + channel prompts + context."""
         from datetime import date
@@ -154,7 +170,11 @@ class ReactAgent:
         ]
 
         if self.dispute_id:
+            # Keep the raw ID (tools take it as an argument) plus the loaded
+            # case details so the agent never asks for facts already on file.
             parts.append(f"\n## Active Dispute\nDispute ID: {self.dispute_id}")
+            if dispute_block:
+                parts.append(dispute_block)
 
         if rag_context:
             parts.append(f"\n## Reference Context\n{rag_context}")
@@ -247,8 +267,9 @@ class ReactAgent:
             # 3. Load RAG context
             rag_context = self._load_rag_context(user_message)
 
-            # 4. Build system prompt
-            system_prompt = self._build_system_prompt(skill, rag_context, history)
+            # 4. Build system prompt (with case details when a dispute is active)
+            dispute_block = await self._load_dispute_block()
+            system_prompt = self._build_system_prompt(skill, rag_context, history, dispute_block)
 
             # 5. Prepare messages
             messages: list[dict[str, Any]] = [
