@@ -8,8 +8,8 @@ import * as api from "@/lib/api";
 import toast from "react-hot-toast";
 
 const SELLER_DEMOS = [
-  { udyam: "UDYAM-MH-01-0012345", name: "Rajesh Kumar", org: "Kumar Enterprises" },
-  { udyam: "UDYAM-RJ-02-0067890", name: "Priya Sharma", org: "Sharma Textiles Pvt Ltd" },
+  { udyam: "UDYAM-MH-01-0012345", name: "Ravi Kumar Verma", org: "Verma Enterprises" },
+  { udyam: "UDYAM-RJ-02-0067890", name: "Gaurav Saini", org: "AI Technology" },
 ];
 
 const ADMIN_DEMO = { mobile: "9876543200", name: "Admin User", org: "ODRMitra Platform" };
