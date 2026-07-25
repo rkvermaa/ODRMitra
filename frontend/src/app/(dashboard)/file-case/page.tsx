@@ -85,7 +85,9 @@ function GradientOrb({ phase }: { phase: Phase }) {
   const isActive = phase !== "idle";
 
   return (
-    <div className="relative flex items-center justify-center">
+    // pointer-events-none: the animate-ping glow ring scales to 2x (560px) and
+    // would otherwise cover — and swallow clicks meant for — the End Call button.
+    <div className="pointer-events-none relative flex items-center justify-center">
       {/* Outer glow rings */}
       {isActive && (
         <>
