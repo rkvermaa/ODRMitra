@@ -638,38 +638,6 @@ function RoadmapSlide() {
         </GlowBox>
       </div>
 
-      <p className="mt-10 text-center text-lg text-[#cbd4e2]">
-        Current footprint <span className="font-semibold text-white">&lt; ₹2,000/month</span> —
-        API-based AI means cost scales <span className="font-semibold text-white">with usage,
-        not with idle capacity</span>
-      </p>
-    </div>
-  );
-}
-
-function TeamSlide() {
-  const team = [
-    ["AI/ML Engineer · Team Lead", "IIT Roorkee · 6 years government service (BSNL) · production ML deployment (Genus Power / UPCL) · LLM agents, RAG, voice AI"],
-    ["Full-Stack Developer", "Next.js & React frontends · FastAPI + PostgreSQL backends · Docker & cloud deployment"],
-    ["Domain Expert · Legal Research", "MSMED Act & MSEFC procedures · ODR process design · ground-level MSME insight"],
-  ];
-  return (
-    <div className="flex h-full flex-col justify-center">
-      <Kicker>Team</Kicker>
-      <SlideTitle>Government experience meets applied AI</SlideTitle>
-
-      <div className="mt-10 grid grid-cols-3 gap-5">
-        {team.map(([role, desc]) => (
-          <GlowBox key={role}>
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#dcb877] to-[#a87f3d]">
-              <Users className="h-5 w-5 text-white" />
-            </div>
-            <p className="mt-4 text-lg font-semibold leading-snug text-white">{role}</p>
-            <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">{desc}</p>
-          </GlowBox>
-        ))}
-      </div>
-
     </div>
   );
 }
@@ -715,7 +683,6 @@ const SLIDES: React.ComponentType[] = [
   ComplianceSlide,
   ResilienceSlide,
   RoadmapSlide,
-  TeamSlide,
   DemoHighlightsSlide,
   ClosingSlide,
 ];

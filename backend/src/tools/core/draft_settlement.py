@@ -66,7 +66,7 @@ class DraftSettlementTool(BaseTool):
 Case Number: {dispute.case_number}
 Claimant: (from case records)
 Respondent: {dispute.respondent_name}
-Original Claim: INR {dispute.claimed_amount:,.2f if dispute.claimed_amount else 0}
+Original Claim: {f'INR {dispute.claimed_amount:,.2f}' if dispute.claimed_amount else 'Not specified'}
 Settlement Amount: INR {settlement_amount:,.2f}
 Payment Terms: {payment_terms}
 {f'Additional Terms: {additional_terms}' if additional_terms else ''}

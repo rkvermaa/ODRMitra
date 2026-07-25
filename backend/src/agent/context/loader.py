@@ -197,6 +197,10 @@ def build_respondent_context(disputes: list[dict[str, Any]]) -> str:
         "that case's dispute_id, the response_type, their statement, and any",
         "admitted amount. Do not wait or re-confirm; record it, then explain",
         "the next steps from the tool result.",
+        "",
+        "Settlement: if BOTH sides' agreement on an amount is on record, call",
+        "`finalize_settlement` — it drafts the agreement and WhatsApps the",
+        "summary to both parties. Never finalize on one side's offer alone.",
     ]
     for i, d in enumerate(disputes, 1):
         stage = STATUS_LABELS.get(d["status"], d["status"])

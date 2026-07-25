@@ -13,6 +13,7 @@ from src.tools.core.save_case_details import SaveCaseDetailsTool
 from src.tools.core.create_new_case import CreateNewCaseTool
 from src.tools.core.submit_defense import SubmitDefenseTool
 from src.tools.core.send_intimation import SendIntimationTool
+from src.tools.core.finalize_settlement import FinalizeSettlementTool
 
 CORE_TOOLS: dict[str, type] = {
     "classify_dispute": ClassifyDisputeTool,
@@ -28,4 +29,5 @@ CORE_TOOLS: dict[str, type] = {
     "create_new_case": CreateNewCaseTool,
     "submit_defense": SubmitDefenseTool,
     "send_intimation": SendIntimationTool,
+    "finalize_settlement": FinalizeSettlementTool,
 }
