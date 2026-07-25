@@ -124,15 +124,40 @@ async def load_dispute_context(dispute_id: str, user_id: str, db: AsyncSession) 
         return {}
 
 
+# Human-readable stage names for the 16-step ODR workflow — the raw codes
+# invite the LLM to invent expansions ("dgp" != "Document Gathering Phase").
+STATUS_LABELS: dict[str, str] = {
+    "filed": "Statement of Claim filed (Step 2)",
+    "intimation_sent": "Buyer intimation sent (Step 3)",
+    "sod_filed": "Statement of Defence filed (Step 4)",
+    "pre_msefc": "Pre-MSEFC mutual settlement stage (Step 5)",
+    "dgp": "Digital Guided Pathway — AI outcome prediction (Step 6)",
+    "negotiation": "Unmanned Negotiation (Step 7)",
+    "msefc": "Referred to MSEFC (Step 8)",
+    "scrutiny_soc": "MSEFC scrutiny of claim (Step 9)",
+    "notice": "MSEFC notice issued (Step 10)",
+    "scrutiny_sod": "MSEFC scrutiny of defence (Step 11)",
+    "conciliation_assigned": "Conciliator assigned (Step 12)",
+    "conciliation_proceedings": "Conciliation proceedings (Step 13)",
+    "conciliation": "Conciliation (Step 13)",
+    "arbitration": "Arbitration (Step 14)",
+    "resolution": "Resolution / award (Step 15)",
+    "closed": "Case closed (Step 16)",
+}
+
+
 def build_dispute_context(dispute_info: dict[str, Any]) -> str:
     """Format dispute details as text block for prompt injection."""
     if not dispute_info or not dispute_info.get("case_number"):
         return ""
 
+    status = dispute_info["status"]
+    status_label = STATUS_LABELS.get(status, status)
+
     parts = ["## CASE DETAILS — from database"]
     parts.append(f"Case Number: {dispute_info['case_number']}")
     parts.append(f"Title: {dispute_info['title']}")
-    parts.append(f"Status: {dispute_info['status']}")
+    parts.append(f"Status: {status_label}")
     parts.append(f"Category: {dispute_info['category']}")
     parts.append(f"Filed on: {dispute_info['created_at']}")
 

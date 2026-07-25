@@ -77,12 +77,16 @@ class LookupCasesTool(BaseTool):
                     "cases": [],
                 }
 
+            from src.agent.context.loader import STATUS_LABELS
+
             cases = []
             for d in disputes:
                 cases.append({
                     "case_number": d.case_number,
                     "title": d.title,
-                    "status": d.status,
+                    # Human-readable stage — the raw code invites the LLM to
+                    # invent expansions ("dgp" != "Document Gathering Phase").
+                    "status": STATUS_LABELS.get(d.status, d.status),
                     "category": d.category,
                     "claimed_amount": float(d.claimed_amount) if d.claimed_amount else None,
                     "respondent_name": d.respondent_name,
