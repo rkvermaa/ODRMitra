@@ -175,6 +175,9 @@ export default function FileCasePage() {
   const pendingAssistantMsgRef = useRef<string | null>(null); // Show text only when TTS starts
   const messagesRef = useRef<Message[]>([]); // Keep messages accessible in closures
   const awaitingTTSRef = useRef(false); // When true, playTTS is awaiting audio completion — skip auto-record
+  // Incremented on every End Call — async continuations capture the value at
+  // entry and bail if it changed, so nothing can resume after a stop.
+  const callGenRef = useRef(0);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -348,20 +351,17 @@ export default function FileCasePage() {
   // ─── Pipeline: STT → LLM → TTS ───
   const processPipeline = useCallback(
     async (audioBlob: Blob) => {
+      const gen = callGenRef.current;
+      const stopped = () => gen !== callGenRef.current || !conversationActiveRef.current;
+
       setPhase("processing");
       try {
         // Bail out if conversation was stopped while we were processing
-        if (!conversationActiveRef.current) {
-          setPhase("idle");
-          return;
-        }
+        if (stopped()) return;
 
         const transcript = await sendSTT(audioBlob);
 
-        if (!conversationActiveRef.current) {
-          setPhase("idle");
-          return;
-        }
+        if (stopped()) return;
 
         if (!transcript) {
           // Auto-restart listening if conversation is active
@@ -380,18 +380,12 @@ export default function FileCasePage() {
 
         const langCode = await sendLID(transcript);
 
-        if (!conversationActiveRef.current) {
-          setPhase("idle");
-          return;
-        }
+        if (stopped()) return;
 
         const disputeId = mode === "existing-case" ? selectedDisputeId : undefined;
         const res = await api.sendMessage(transcript, sessionId, disputeId || undefined, "voice");
 
-        if (!conversationActiveRef.current) {
-          setPhase("idle");
-          return;
-        }
+        if (stopped()) return;
 
         setSessionId(res.session_id);
 
@@ -437,6 +431,10 @@ export default function FileCasePage() {
         if (isComplete && mode === "new-case") {
           // Filing complete — await TTS so user hears the full final message
           await playTTS(cleanResponse, langCode, true);
+
+          // If End Call was clicked during the final message, its handler owns
+          // the cleanup and partial save — do not finalize/redirect on top.
+          if (gen !== callGenRef.current) return;
 
           // TTS done — stop conversation, show loader, extract fields via LLM, redirect
           conversationActiveRef.current = false;
@@ -631,6 +629,8 @@ export default function FileCasePage() {
   }, []);
 
   const stopConversation = useCallback(async () => {
+    // Invalidate every in-flight async continuation (pipeline, TTS, timers)
+    callGenRef.current += 1;
     // Set flags FIRST so in-flight pipeline checks and recorder.onstop bail out
     stoppingRef.current = true;
     conversationActiveRef.current = false;
