@@ -1,7 +1,7 @@
 """Agent Engine — orchestrator that picks the right agent based on channel.
 
 - Voice channel → VoiceAgent (single LLM call, fast, no tools, seller profile injected)
-- WhatsApp → WhatsAppGraph (LangGraph router → new/existing/general branches)
+- WhatsApp → WhatsAppAgent (framework-native create_agent, all tools, autonomous loop)
 - Web/telegram → ReactAgent (ReAct loop with tools)
 """
 
@@ -10,11 +10,11 @@ from typing import Any
 from src.core.logging import log
 from src.agent.voice_agent import VoiceAgent
 from src.agent.react_agent import ReactAgent
-from src.agent.whatsapp_graph import WhatsAppGraph
+from src.agent.whatsapp_agent import WhatsAppAgent
 
 
 class AgentEngine:
-    """Thin orchestrator — delegates to VoiceAgent, WhatsAppGraph, or ReactAgent.
+    """Thin orchestrator — delegates to VoiceAgent, WhatsAppAgent, or ReactAgent.
 
     Maintains the same interface so callers (chat.py, webhook.py) don't change.
     For voice channel, fetches seller profile from DB before processing.
@@ -33,10 +33,10 @@ class AgentEngine:
         self.channel = channel
 
         # For non-voice channels, create agent immediately
-        self._agent: VoiceAgent | ReactAgent | WhatsAppGraph | None = None
+        self._agent: VoiceAgent | ReactAgent | WhatsAppAgent | None = None
 
         if channel == "whatsapp":
-            self._agent = WhatsAppGraph(
+            self._agent = WhatsAppAgent(
                 user_id=user_id,
                 session_id=session_id,
                 dispute_id=dispute_id,
@@ -51,7 +51,7 @@ class AgentEngine:
 
         agent_name = (
             "VoiceAgent (lazy)" if channel == "voice"
-            else "WhatsAppGraph" if channel == "whatsapp"
+            else "WhatsAppAgent" if channel == "whatsapp"
             else "ReactAgent"
         )
         log.info(f"AgentEngine: channel={channel} → {agent_name}")
