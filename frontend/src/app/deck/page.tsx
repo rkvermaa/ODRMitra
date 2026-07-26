@@ -16,11 +16,9 @@ import {
   Globe,
   FileSearch,
   TrendingUp,
-  Calculator,
   FileSignature,
   ShieldCheck,
   Landmark,
-  Bot,
   Database,
   BookOpen,
   Zap,
@@ -63,6 +61,39 @@ function LivePill({ label = "LIVE" }: { label?: string }) {
       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
       {label}
     </span>
+  );
+}
+
+const SECTIONS = [
+  "Overview & Alignment",
+  "Architecture",
+  "Datasets & Methodology",
+  "Live Demonstration",
+];
+
+/** Top-right indicator: the PMU's four requested sections, current one lit. */
+function Spine({ active }: { active: number }) {
+  return (
+    <div className="absolute right-8 top-10 z-20 flex flex-col items-end gap-2">
+      {SECTIONS.map((label, k) => {
+        const on = k + 1 === active;
+        return (
+          <span
+            key={label}
+            className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] ${
+              on ? "text-[#d9b36a]" : "text-[#76839f]"
+            }`}
+          >
+            {k + 1} · {label}
+            <span
+              className={`h-0.5 rounded-full ${
+                on ? "w-7 bg-[#d9b36a]" : "w-4 bg-[#31405f]"
+              }`}
+            />
+          </span>
+        );
+      })}
+    </div>
   );
 }
 
@@ -284,90 +315,175 @@ function DemoHighlightsSlide() {
   );
 }
 
-function TechTag({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border border-[#93a5c4]/20 bg-[#0b1120]/70 px-2 py-0.5 font-mono text-[10.5px] text-[#76839f]">
-      {children}
-    </span>
-  );
-}
-
 function ArchitectureSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>2 · Solution Architecture</Kicker>
-      <SlideTitle>One assistant listens, thinks in law, and acts</SlideTitle>
+      <SlideTitle>Three channels, one agent, fourteen scoped tools</SlideTitle>
 
-      <div className="mt-10 grid grid-cols-[1fr_auto_1.3fr_auto_1fr] items-stretch gap-4">
-        {/* Users reach it */}
-        <GlowBox>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#76839f]">
-            How sellers reach it
-          </p>
-          <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><Mic className="h-5 w-5 text-[#d9b36a]" /> A phone conversation</p>
-            <p className="flex items-center gap-2.5"><MessageSquare className="h-5 w-5 text-[#d9b36a]" /> A WhatsApp message</p>
-            <p className="flex items-center gap-2.5"><Globe className="h-5 w-5 text-[#d9b36a]" /> A simple website</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            <TechTag>Sarvam saarika (STT)</TechTag>
-            <TechTag>Sarvam bulbul (TTS)</TechTag>
-            <TechTag>Next.js</TechTag>
-          </div>
-        </GlowBox>
+      <div className="mt-8">
+        <svg
+          viewBox="0 0 1140 216"
+          className="w-full"
+          role="img"
+          aria-label="Three channels feed one agent runtime, which acts through fourteen scoped tools over three data stores."
+        >
+          <style>{`
+            .arch-bx{fill:rgba(28,39,64,.55);stroke:rgba(147,165,196,.28);stroke-width:1}
+            .arch-bxa{fill:rgba(217,179,106,.1);stroke:rgba(217,179,106,.5);stroke-width:1.2}
+            .arch-lb{fill:#e7ecf4;font:600 13px ui-sans-serif,system-ui,sans-serif}
+            .arch-sm{fill:#93a5c4;font:10.5px ui-monospace,monospace}
+            .arch-hd{fill:#d9b36a;font:800 10px ui-sans-serif,system-ui,sans-serif;letter-spacing:.17em}
+            .arch-fl{stroke:rgba(217,179,106,.55);stroke-width:1.4;fill:none;marker-end:url(#arch-arw)}
+          `}</style>
+          <defs>
+            <marker id="arch-arw" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="rgba(217,179,106,.75)" />
+            </marker>
+          </defs>
 
-        <ArrowRight className="h-6 w-6 self-center text-[#d9b36a]" />
+          <text x="6" y="12" className="arch-hd">CHANNELS</text>
+          <rect className="arch-bx" x="6" y="24" width="180" height="48" rx="9" />
+          <text x="21" y="45" className="arch-lb">Voice call</text>
+          <text x="21" y="61" className="arch-sm">Sarvam saarika → bulbul</text>
+          <rect className="arch-bx" x="6" y="84" width="180" height="48" rx="9" />
+          <text x="21" y="105" className="arch-lb">WhatsApp</text>
+          <text x="21" y="121" className="arch-sm">session bridge</text>
+          <rect className="arch-bx" x="6" y="144" width="180" height="48" rx="9" />
+          <text x="21" y="165" className="arch-lb">Web dashboard</text>
+          <text x="21" y="181" className="arch-sm">Next.js</text>
 
-        {/* The brain */}
-        <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
-          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[#e8cd9a]">
-            <Bot className="h-4 w-4" /> The AI Assistant
-          </p>
-          <p className="mt-2 text-[15px] leading-relaxed text-[#cbd4e2]">
-            One assistant understands the conversation and acts only through{" "}
-            <span className="font-semibold text-white">
-              14 approved legal actions
-            </span>{" "}
-            — file the case, notify the buyer, record the defense, predict the
-            outcome, calculate interest, draft the settlement.
-          </p>
-          <p className="mt-2 text-[15px] text-[#cbd4e2]">
-            The underlying AI model is{" "}
-            <span className="font-semibold text-white">swappable</span> — the
-            government can choose any model, Indian or open-source.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <TechTag>LangChain agent</TechTag>
-            <TechTag>DeepSeek LLM (API)</TechTag>
-            <TechTag>FastAPI</TechTag>
-          </div>
-        </GlowBox>
+          <path className="arch-fl" d="M190,48 C232,48 232,140 278,140" />
+          <path className="arch-fl" d="M190,108 C232,108 232,140 278,140" />
+          <path className="arch-fl" d="M190,168 C232,168 232,142 278,142" />
 
-        <ArrowRight className="h-6 w-6 self-center text-[#d9b36a]" />
+          <text x="284" y="12" className="arch-hd">AGENT RUNTIME</text>
+          <rect className="arch-bxa" x="284" y="24" width="228" height="168" rx="9" />
+          <text x="301" y="48" className="arch-lb">Language model</text>
+          <text x="301" y="65" className="arch-sm">DeepSeek · swappable endpoint</text>
+          <text x="301" y="92" className="arch-lb">ReAct loop</text>
+          <text x="301" y="109" className="arch-sm">plan → tool → observe</text>
+          <text x="301" y="136" className="arch-lb">Skills</text>
+          <text x="301" y="153" className="arch-sm">7 stage playbooks</text>
+          <text x="301" y="180" className="arch-sm">no training · retrieval-grounded</text>
 
-        {/* Knowledge */}
-        <GlowBox>
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#76839f]">
-            What it thinks with
-          </p>
-          <div className="mt-3 space-y-2.5 text-lg text-white">
-            <p className="flex items-center gap-2.5"><BookOpen className="h-5 w-5 text-[#d9b36a]" /> An indexed law library</p>
-            <p className="flex items-center gap-2.5"><Database className="h-5 w-5 text-[#d9b36a]" /> Secure case records</p>
-            <p className="flex items-center gap-2.5"><ShieldCheck className="h-5 w-5 text-[#d9b36a]" /> Answers quote the Act</p>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            <TechTag>PostgreSQL</TechTag>
-            <TechTag>Qdrant vector search</TechTag>
-            <TechTag>OpenRouter embeddings</TechTag>
-          </div>
-        </GlowBox>
+          <path className="arch-fl" d="M516,108 L568,108" />
+
+          <text x="574" y="12" className="arch-hd">TOOLS · 14</text>
+          <rect className="arch-bx" x="574" y="24" width="232" height="168" rx="9" />
+          <text x="590" y="46" className="arch-lb">Statute &amp; retrieval</text>
+          <text x="590" y="62" className="arch-sm">provision lookup · knowledge search</text>
+          <text x="590" y="88" className="arch-lb">Computation</text>
+          <text x="590" y="104" className="arch-sm">s.16 interest — exact formula</text>
+          <text x="590" y="130" className="arch-lb">Case actions</text>
+          <text x="590" y="146" className="arch-sm">file · classify · notice · defence</text>
+          <text x="590" y="172" className="arch-lb">Settlement</text>
+          <text x="590" y="188" className="arch-sm">predict · draft · finalise</text>
+
+          <path className="arch-fl" d="M810,108 L862,108" />
+
+          <text x="868" y="12" className="arch-hd">STORES</text>
+          <rect className="arch-bx" x="868" y="24" width="266" height="48" rx="9" />
+          <text x="884" y="45" className="arch-lb">PostgreSQL</text>
+          <text x="884" y="61" className="arch-sm">parties · filings · timestamps</text>
+          <rect className="arch-bx" x="868" y="84" width="266" height="48" rx="9" />
+          <text x="884" y="105" className="arch-lb">Qdrant</text>
+          <text x="884" y="121" className="arch-sm">statutory index — MSMED corpus</text>
+          <rect className="arch-bx" x="868" y="144" width="266" height="48" rx="9" />
+          <text x="884" y="165" className="arch-lb">Audit trail</text>
+          <text x="884" y="181" className="arch-sm">every tool call logged</text>
+        </svg>
       </div>
 
-      <p className="mt-10 text-center text-lg text-[#a3aec3]">
-        The law library holds the MSMED Act 2006, MSEFC rules, the Mediation
-        Act, and Supreme Court judgments — the assistant quotes the law, it
-        never invents it
-      </p>
+      <div className="mt-7 flex items-start gap-3 rounded-2xl border border-[#c9a45c]/35 bg-[#c9a45c]/10 p-5">
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#e8cd9a]" />
+        <p className="text-[15px] leading-relaxed text-[#cbd4e2]">
+          <span className="font-semibold text-white">
+            Human authority is structural, not a setting.{" "}
+          </span>
+          The agent files, computes and drafts. Conciliation, arbitration and
+          every decision stay with the MSEFC — no AI output binds a party.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function StagePill() {
+  return (
+    <span className="inline-flex items-center rounded-full bg-[#93a5c4]/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-[#93a5c4] ring-1 ring-[#93a5c4]/30">
+      STAGE 1
+    </span>
+  );
+}
+
+function ModelsSlide() {
+  const rows: [string, string, string, boolean][] = [
+    ["Speech in", "Sarvam saarika", "Built for Indian-language and code-mixed speech — Hinglish survives it", true],
+    ["Speech out", "Sarvam bulbul", "Natural Hindi playback from the browser", true],
+    ["Reasoning", "DeepSeek LLM · OpenAI-compatible endpoint", "Hosted API keeps the PoC GPU-free; the model swaps in one config line", true],
+    ["Retrieval", "Qdrant over the statutory corpus", "Legal answers are read at query time, never recalled from model memory", true],
+    ["Case of record", "PostgreSQL", "Filings, parties, timestamps — a full audit trail", true],
+    ["Messaging", "WhatsApp bridge", "Zero-cost client in the PoC; production moves to the WhatsApp Business API", false],
+  ];
+  return (
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>2 · Architecture — Models &amp; Technologies</Kicker>
+      <SlideTitle>What runs today, and what a pilot funds</SlideTitle>
+
+      <div className="mt-8 overflow-hidden rounded-2xl border border-[#93a5c4]/15">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="bg-[#1c2740]/60">
+              <th className="w-[15%] px-4 py-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.15em] text-[#76839f]">Layer</th>
+              <th className="w-[26%] px-4 py-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.15em] text-[#76839f]">What we run</th>
+              <th className="px-4 py-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.15em] text-[#76839f]">Why</th>
+              <th className="w-[11%] px-4 py-2.5 text-[10.5px] font-extrabold uppercase tracking-[0.15em] text-[#76839f]">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([layer, what, why, live]) => (
+              <tr key={layer}>
+                <td className="border-t border-[#31405f]/50 px-4 py-2 text-[13.5px] font-semibold text-white">{layer}</td>
+                <td className="border-t border-[#31405f]/50 px-4 py-2 text-[13.5px] text-[#cbd4e2]">{what}</td>
+                <td className="border-t border-[#31405f]/50 px-4 py-2 text-[13px] leading-snug text-[#a3aec3]">{why}</td>
+                <td className="border-t border-[#31405f]/50 px-4 py-2">
+                  {live ? <LivePill /> : <StagePill />}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-4">
+        <GlowBox>
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#76839f]">
+            Measured response times — honest numbers
+          </p>
+          <p className="mt-2 text-[15px] leading-relaxed text-[#cbd4e2]">
+            WhatsApp replies land in{" "}
+            <span className="font-semibold text-white">3–5 seconds</span>. A
+            voice turn takes{" "}
+            <span className="font-semibold text-white">~12 seconds</span> today
+            — speech-to-text, reasoning, and speech-out in sequence; Stage 1
+            streaming targets ~4 seconds.
+          </p>
+        </GlowBox>
+        <GlowBox className="border-[#c9a45c]/35 bg-[#c9a45c]/10">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[#e8cd9a]">
+            Sovereignty is a configuration
+          </p>
+          <p className="mt-2 text-[15px] leading-relaxed text-[#cbd4e2]">
+            Reasoning sits behind one OpenAI-compatible endpoint — Stage 1 can
+            move it to an{" "}
+            <span className="font-semibold text-white">
+              open-weight Indian model from AIKosh
+            </span>{" "}
+            with a settings change, not a rebuild.
+          </p>
+        </GlowBox>
+      </div>
     </div>
   );
 }
@@ -705,24 +821,24 @@ function ClosingSlide() {
   );
 }
 
-const SLIDES: React.ComponentType[] = [
-  // Ordered to mirror the PMU's requested structure:
-  // 1 Overview & use-case alignment · 2 Architecture & workflow ·
-  // 3 Datasets & methodology · 4 Live demonstration
-  TitleSlide,
-  ProblemSlide,
-  SolutionSlide,
-  CapabilitiesSlide,
-  ArchitectureSlide,
-  PipelineSlide,
-  JourneySlide,
-  DatasetsSlide,
-  ComplianceSlide,
-  ResilienceSlide,
-  RoadmapSlide,
-  DemoMapSlide,
-  DemoHighlightsSlide,
-  ClosingSlide,
+// Ordered to mirror the PMU's requested structure; `sec` drives the
+// top-right Spine indicator (0 = no indicator: title/roadmap/closing).
+const SLIDES: { C: React.ComponentType; sec: number }[] = [
+  { C: TitleSlide, sec: 0 },
+  { C: ProblemSlide, sec: 1 },
+  { C: SolutionSlide, sec: 1 },
+  { C: CapabilitiesSlide, sec: 1 },
+  { C: ArchitectureSlide, sec: 2 },
+  { C: ModelsSlide, sec: 2 },
+  { C: PipelineSlide, sec: 2 },
+  { C: JourneySlide, sec: 2 },
+  { C: DatasetsSlide, sec: 3 },
+  { C: ComplianceSlide, sec: 3 },
+  { C: ResilienceSlide, sec: 3 },
+  { C: RoadmapSlide, sec: 0 },
+  { C: DemoMapSlide, sec: 4 },
+  { C: DemoHighlightsSlide, sec: 4 },
+  { C: ClosingSlide, sec: 0 },
 ];
 
 /* ── Deck shell ──────────────────────────────────────────────────── */
@@ -778,7 +894,7 @@ export default function DeckPage() {
         className="deck-stage relative shrink-0"
         style={{ width: W, height: H, transform: `scale(${scale})` }}
       >
-        {SLIDES.map((Slide, i) => (
+        {SLIDES.map(({ C: Slide, sec }, i) => (
           <section
             key={i}
             className={`slide absolute inset-0 overflow-hidden bg-gradient-to-br from-[#141c2e] via-[#0d1424] to-[#070b15] px-20 py-14 transition-all duration-500 ${
@@ -794,6 +910,7 @@ export default function DeckPage() {
               className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full opacity-15"
               style={{ background: "radial-gradient(circle, #c9a45c, transparent 70%)" }}
             />
+            {sec > 0 && <Spine active={sec} />}
             <div className="relative h-full">
               <Slide />
             </div>
