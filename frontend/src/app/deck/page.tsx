@@ -147,6 +147,14 @@ function TitleSlide() {
   );
 }
 
+function Marker({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="-mx-1 rounded-sm bg-[#fce34d]/90 px-1 pb-0.5 [box-decoration-break:clone]">
+      {children}
+    </span>
+  );
+}
+
 function NewsClipping({
   masthead,
   date,
@@ -155,7 +163,7 @@ function NewsClipping({
 }: {
   masthead: string;
   date: string;
-  headline: string;
+  headline: React.ReactNode;
   tilt: string;
 }) {
   return (
@@ -190,13 +198,23 @@ function ProblemSlide() {
         <NewsClipping
           masthead="The Economic Times"
           date="Jan 2026"
-          headline="Rs 8.1 lakh crore stuck in delayed MSME payments: Eco Survey 2026"
+          headline={
+            <>
+              <Marker>Rs 8.1 lakh crore</Marker> stuck in delayed MSME
+              payments: Eco Survey 2026
+            </>
+          }
           tilt="-rotate-1"
         />
         <NewsClipping
           masthead="Business Today"
           date="27 Feb 2026"
-          headline="Rs 8.1 lakh crore stuck in dues: MSME growth hinges on dispute reform, warns new White Paper"
+          headline={
+            <>
+              <Marker>Rs 8.1 lakh crore stuck in dues</Marker>: MSME growth
+              hinges on dispute reform, warns new White Paper
+            </>
+          }
           tilt="rotate-1"
         />
       </div>
