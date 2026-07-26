@@ -198,7 +198,9 @@ def build_respondent_context(disputes: list[dict[str, Any]]) -> str:
         "admitted amount. Do not wait or re-confirm; record it, then explain",
         "the next steps from the tool result.",
         "",
-        "Settlement: if BOTH sides' agreement on an amount is on record, call",
+        "Settlement: if they state an offer or counter-offer amount, call",
+        "`relay_settlement_offer` — it delivers the offer to the other party",
+        "on WhatsApp. If BOTH sides' agreement on an amount is on record, call",
         "`finalize_settlement` — it drafts the agreement and WhatsApps the",
         "summary to both parties. Never finalize on one side's offer alone.",
     ]

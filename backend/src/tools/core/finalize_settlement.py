@@ -168,8 +168,8 @@ class FinalizeSettlementTool(BaseTool):
             return {"error": str(e)}
 
 
-async def _send_whatsapp(mobile: str, message: str) -> None:
-    """Send a message via the connected bot (best-effort)."""
+async def _send_whatsapp(mobile: str, message: str) -> bool:
+    """Send a message via the connected bot. Returns True on delivery."""
     import httpx
 
     from src.config import settings
@@ -178,17 +178,22 @@ async def _send_whatsapp(mobile: str, message: str) -> None:
     try:
         session_id = await _get_baileys_session_id()
         if not session_id:
-            log.warning("finalize_settlement: no connected bot — WhatsApp copy not sent")
-            return
+            log.warning("settlement WhatsApp: no connected bot — message not sent")
+            return False
         baileys_url = settings.get("baileys_service_url", "http://127.0.0.1:3001")
         api_key = settings.get("baileys_api_key", "baileys-secret-key")
         async with httpx.AsyncClient() as client:
-            await client.post(
+            resp = await client.post(
                 f"{baileys_url}/sessions/{session_id}/send",
                 json={"to": _normalize_mobile(mobile), "message": message},
                 headers={"X-API-Key": api_key, "Content-Type": "application/json"},
                 timeout=30.0,
             )
-        log.info(f"Settlement summary sent to {mobile}")
+        if resp.status_code >= 400:
+            log.error(f"Settlement WhatsApp send failed for {mobile}: HTTP {resp.status_code}")
+            return False
+        log.info(f"Settlement message sent to {mobile}")
+        return True
     except Exception as e:
         log.error(f"Settlement WhatsApp send failed for {mobile}: {e}")
+        return False

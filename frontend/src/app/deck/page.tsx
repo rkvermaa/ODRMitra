@@ -319,14 +319,14 @@ function ArchitectureSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>2 · Solution Architecture</Kicker>
-      <SlideTitle>Three channels, one agent, fourteen scoped tools</SlideTitle>
+      <SlideTitle>Three channels, one agent, fifteen scoped tools</SlideTitle>
 
       <div className="mt-8">
         <svg
           viewBox="0 0 1140 216"
           className="w-full"
           role="img"
-          aria-label="Three channels feed one agent runtime, which acts through fourteen scoped tools over three data stores."
+          aria-label="Three channels feed one agent runtime, which acts through fifteen scoped tools over three data stores."
         >
           <style>{`
             .arch-bx{fill:rgba(28,39,64,.55);stroke:rgba(147,165,196,.28);stroke-width:1}
@@ -369,7 +369,7 @@ function ArchitectureSlide() {
 
           <path className="arch-fl" d="M516,108 L568,108" />
 
-          <text x="574" y="12" className="arch-hd">TOOLS · 14</text>
+          <text x="574" y="12" className="arch-hd">TOOLS · 15</text>
           <rect className="arch-bx" x="574" y="24" width="232" height="168" rx="9" />
           <text x="590" y="46" className="arch-lb">Statute &amp; retrieval</text>
           <text x="590" y="62" className="arch-sm">provision lookup · knowledge search</text>
@@ -669,7 +669,7 @@ function DatasetsSlide() {
             </li>
             <li>
               <span className="font-semibold text-white">Tool-scoped agent:</span>{" "}
-              every action flows through one of 14 approved, auditable legal
+              every action flows through one of 15 approved, auditable legal
               actions with verified outcomes
             </li>
           </ul>
@@ -681,7 +681,7 @@ function DatasetsSlide() {
 
 function ComplianceSlide() {
   const points = [
-    [ShieldCheck, "Scoped tools, never raw data access", "The agent acts only through 14 audited tools — it cannot query the database freely or touch another user's case. By design, not by prompt."],
+    [ShieldCheck, "Scoped tools, never raw data access", "The agent acts only through 15 audited tools — it cannot query the database freely or touch another user's case. By design, not by prompt."],
     [Users, "Humans own the judgment calls", "AI drives steps 1–7 (filing & facilitation); MSEFC, conciliation, and arbitration (8–16) stay entirely with human authorities."],
     [BookOpen, "Grounded, not generative law", "Every statutory answer is retrieved from indexed Act text — the model cites provisions, it doesn't invent them."],
     [FileSignature, "Verified, auditable actions", "Intimations and defenses are delivery-verified and timestamped; the agent may never claim an action it didn't complete."],
