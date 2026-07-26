@@ -26,8 +26,6 @@ import {
   ArrowRight,
   Phone,
   UserCheck,
-  Timer,
-  IndianRupee,
   Layers,
   GitBranch,
   Users,
@@ -149,38 +147,69 @@ function TitleSlide() {
   );
 }
 
+function NewsClipping({
+  masthead,
+  date,
+  headline,
+  tilt,
+}: {
+  masthead: string;
+  date: string;
+  headline: string;
+  tilt: string;
+}) {
+  return (
+    <div
+      className={`rounded-sm bg-[#f7f3e8] px-7 py-6 font-serif text-[#161311] shadow-2xl shadow-black/50 ${tilt}`}
+    >
+      <div className="flex items-baseline justify-between">
+        <p className="text-lg font-black uppercase tracking-[0.12em]">
+          {masthead}
+        </p>
+        <p className="text-[11px] uppercase tracking-[0.15em] text-[#6b6357]">
+          {date}
+        </p>
+      </div>
+      <div className="mt-2 border-y-[3px] border-double border-[#161311]/80" />
+      <p className="mt-4 text-[27px] font-bold leading-[1.22]">{headline}</p>
+      <div className="mt-4 h-px bg-[#161311]/25" />
+      <p className="mt-2 text-[11px] uppercase tracking-[0.15em] text-[#6b6357]">
+        New Delhi · Bureau Report
+      </p>
+    </div>
+  );
+}
+
 function ProblemSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>1 · Overview — The Problem</Kicker>
       <SlideTitle>India&apos;s MSMEs are owed a fortune they can&apos;t collect</SlideTitle>
 
-      <div className="mt-12 grid grid-cols-3 gap-6">
-        {[
-          ["₹10L Cr+", "stuck in delayed payments every year", IndianRupee],
-          ["< 1%", "of eligible MSMEs ever file a dispute", Users],
-          ["18–24 mo", "for conventional resolution in courts", Timer],
-        ].map(([v, l, Icon]) => {
-          const I = Icon as React.ComponentType<{ className?: string }>;
-          return (
-            <GlowBox key={l as string} className="text-center">
-              <I className="mx-auto h-8 w-8 text-[#d9b36a]" />
-              <p className="mt-4 text-[52px] font-bold leading-none text-white">
-                {v as string}
-              </p>
-              <p className="mt-3 text-lg text-[#a3aec3]">{l as string}</p>
-            </GlowBox>
-          );
-        })}
+      <div className="mt-10 grid grid-cols-2 gap-10 px-4">
+        <NewsClipping
+          masthead="The Economic Times"
+          date="Jan 2026"
+          headline="Rs 8.1 lakh crore stuck in delayed MSME payments: Eco Survey 2026"
+          tilt="-rotate-1"
+        />
+        <NewsClipping
+          masthead="Business Today"
+          date="27 Feb 2026"
+          headline="Rs 8.1 lakh crore stuck in dues: MSME growth hinges on dispute reform, warns new White Paper"
+          tilt="rotate-1"
+        />
       </div>
 
       <p className="mt-12 text-xl leading-relaxed text-[#cbd4e2]">
-        The MSMED Act 2006 gives sellers strong rights — 45-day payment deadline,
-        3× bank-rate compound interest — but{" "}
+        The MSMED Act 2006 gives sellers strong rights — 45-day payment
+        deadline, 3× bank-rate compound interest — yet{" "}
         <span className="font-semibold text-white">
-          English-only portals, form-heavy filings, and legal complexity
-        </span>{" "}
-        keep those rights out of reach for the 80% of MSMEs in tier-2/3 India.
+          fewer than 1% of eligible MSMEs ever file
+        </span>
+        : English-only portals, form-heavy filings, and{" "}
+        <span className="font-semibold text-white">18–24 months in courts</span>{" "}
+        keep those rights out of reach.
       </p>
     </div>
   );
