@@ -476,7 +476,7 @@ function ModelsSlide() {
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>2 · Architecture — Models &amp; Technologies</Kicker>
-      <SlideTitle>What runs today, and what a pilot funds</SlideTitle>
+      <SlideTitle>Every model and technology, named</SlideTitle>
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-[#93a5c4]/15">
         <table className="w-full text-left">
