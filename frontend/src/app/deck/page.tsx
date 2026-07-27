@@ -23,6 +23,7 @@ import {
   BookOpen,
   Zap,
   CheckCircle2,
+  XCircle,
   ArrowRight,
   Phone,
   UserCheck,
@@ -228,6 +229,43 @@ function ProblemSlide() {
         : English-only portals, form-heavy filings, and{" "}
         <span className="font-semibold text-white">18–24 months in courts</span>{" "}
         keep those rights out of reach.
+      </p>
+    </div>
+  );
+}
+
+function PainPointsSlide() {
+  const gaps: [string, string][] = [
+    ["Costly, slow legal process", "18–24 months in courts — legal fees often exceed a small seller's claim"],
+    ["Manual after filing", "E-filing exists, but notices, follow-ups and case management still run on paper and phone calls"],
+    ["No vernacular access", "English-only portals and legal forms exclude the sellers who need them most"],
+    ["Form-heavy, document-heavy", "Physical paperwork and record-keeping defeat a one-person business"],
+    ["Both parties must show up", "Synchronous hearings mean lost workdays for a shop that cannot close"],
+    ["Settlement is an afterthought", "Little focus on conciliation and mediation — disputes queue for adjudication instead"],
+  ];
+  return (
+    <div className="flex h-full flex-col justify-center">
+      <Kicker>1 · Overview — Why the System Fails Sellers</Kicker>
+      <SlideTitle>Justice exists on paper — six reasons it never arrives</SlideTitle>
+
+      <div className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4">
+        {gaps.map(([title, desc]) => (
+          <div key={title} className="flex items-start gap-3">
+            <XCircle className="mt-1 h-5 w-5 shrink-0 text-red-400/80" />
+            <p className="text-[17px] leading-snug text-[#a3aec3]">
+              <span className="font-semibold text-white">{title}</span>
+              {" — "}
+              {desc}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-10 text-xl leading-relaxed text-[#cbd4e2]">
+        Remove these six barriers and the law already works —{" "}
+        <span className="font-semibold text-white">
+          that is the entire design brief of ODRMitra.
+        </span>
       </p>
     </div>
   );
@@ -633,34 +671,41 @@ function JourneySlide() {
 }
 
 function CapabilitiesSlide() {
-  // Only what the live demo actually shows — nothing aspirational.
-  const caps = [
-    [Mic, "Voice-based case filing", "Speak in Hindi/English/Hinglish — the Statement of Claim fills itself, no form"],
-    [MessageSquare, "The case lives on WhatsApp", "Buyer intimation, status updates, missing details, and the buyer's own defense — one chat thread for both parties"],
-    [TrendingUp, "AI outcome prediction", "Probable resolution grounded in statutory provisions, with Section 16 interest computed"],
-    [FileSignature, "Settlement drafted & delivered", "On mutual agreement, the formal agreement is generated and sent to both parties automatically"],
+  // Only what is actually deployed and demoed — nothing aspirational.
+  const caps: [React.ComponentType<{ className?: string }>, string, string][] = [
+    [Mic, "E-filing by voice & chat", "The Statement of Claim files itself from a conversation — Hindi, English, or Hinglish, no forms"],
+    [Phone, "Online notices, delivered in seconds", "Section 18 intimation lands on the buyer's WhatsApp — timestamped and delivery-verified"],
+    [TrendingUp, "Digital Guided Pathway", "AI outcome prediction grounded in statutory text, with Section 16 interest computed by formula"],
+    [Users, "Automated online negotiation", "Offers and counter-offers relayed party to party on WhatsApp, recorded round by round"],
+    [FileSignature, "Settlement agreements, drafted", "On mutual consent the formal agreement is generated and sent to both parties"],
+    [MessageSquare, "Alerts at every stage", "Filing, defense, offers, agreement — both parties stay informed by text message"],
+    [Globe, "Vernacular by default", "Voice and chat in Hindi/Hinglish today; ten-plus Indian languages in Stage 1"],
   ];
   return (
     <div className="flex h-full flex-col justify-center">
       <Kicker>1 · Overview — Alignment with the Use Case</Kicker>
-      <SlideTitle>What you&apos;ll see working today</SlideTitle>
+      <SlideTitle>
+        What ODRMitra does today <LivePill label="ALL LIVE" />
+      </SlideTitle>
 
-      <div className="mt-10 grid grid-cols-2 gap-5">
-        {caps.map(([Icon, title, desc]) => {
-          const I = Icon as React.ComponentType<{ className?: string }>;
+      <div className="mt-8 overflow-hidden rounded-2xl border border-[#93a5c4]/15 bg-[#1c2740]/40">
+        {caps.map(([Icon, title, desc], i) => {
+          const I = Icon;
           return (
-            <GlowBox key={title as string}>
-              <div className="flex items-start justify-between">
-                <I className="h-7 w-7 text-[#d9b36a]" />
-                <LivePill />
-              </div>
-              <p className="mt-3 text-xl font-semibold text-white">
-                {title as string}
+            <div
+              key={title}
+              className={`flex items-center gap-4 px-6 py-[13px] ${
+                i > 0 ? "border-t border-[#31405f]/50" : ""
+              }`}
+            >
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" />
+              <I className="h-5 w-5 shrink-0 text-[#d9b36a]" />
+              <p className="text-[16px] leading-snug text-[#a3aec3]">
+                <span className="font-semibold text-white">{title}</span>
+                {" — "}
+                {desc}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-[#a3aec3]">
-                {desc as string}
-              </p>
-            </GlowBox>
+            </div>
           );
         })}
       </div>
@@ -873,6 +918,7 @@ function ClosingSlide() {
 const SLIDES: { C: React.ComponentType; sec: number }[] = [
   { C: TitleSlide, sec: 0 },
   { C: ProblemSlide, sec: 1 },
+  { C: PainPointsSlide, sec: 1 },
   { C: SolutionSlide, sec: 1 },
   { C: CapabilitiesSlide, sec: 1 },
   { C: ArchitectureSlide, sec: 2 },
